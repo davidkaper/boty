@@ -1,4 +1,3 @@
-# api/index.py
 import os
 from flask import Flask, request
 from telegram import Update, Bot
@@ -7,18 +6,18 @@ app = Flask(__name__)
 
 TOKEN = os.getenv("BOT_TOKEN")
 if not TOKEN:
-    raise ValueError("BOT_TOKEN not set!")
+    raise ValueError("BOT_TOKEN is not set in environment variables!")
 
 bot = Bot(token=TOKEN)
 
-BAD_WORDS = ["کلمه۱", "کلمه۲", "تست", "بد"]  # گسترش بده
+BAD_WORDS = ["کلمه۱", "کلمه۲", "تست"]  # کلمات خودت رو اضافه کن
 
 @app.route('/', methods=['POST'])
 def webhook():
     try:
         update_dict = request.get_json(force=True)
         if not update_dict:
-            return "No JSON", 400
+            return "No data", 400
 
         update = Update.de_json(update_dict, bot)
         if not update or not update.message:
@@ -28,25 +27,25 @@ def webhook():
         text = (msg.text or msg.caption or "").lower()
         chat_id = msg.chat_id
 
-        # خوش‌آمدگویی
+        # خوش آمدگویی
         if msg.new_chat_members:
             for member in msg.new_chat_members:
-                welcome = f"سلام {member.full_name} عزیز به گروه وکسوروم خوش آمدی!\n🌐 vaxorum.xyz"
-                bot.send_message(chat_id=chat_id, text=welcome)
+                welcome_text = f"سلام {member.full_name} عزیز به گروه وکسوروم خوش آمدی!\n🌐 vaxorum.xyz"
+                bot.send_message(chat_id=chat_id, text=welcome_text)
             return "OK", 200
 
         # فیلتر
-        is_media = bool(msg.photo or msg.video or msg.document or msg.animation or msg.voice)
-        is_link = any(x in text for x in ["http", "https", "t.me/", "@"])
-        is_bad = any(word in text for word in BAD_WORDS)
+        is_media = bool(msg.photo or msg.video or msg.document or msg.animation or msg.voice or msg.video_note)
+        is_link = any(sub in text for sub in ["http", "https", "t.me/", "@"])
+        is_bad_word = any(word in text for word in BAD_WORDS)
 
-        if is_media or is_link or is_bad:
+        if is_media or is_link or is_bad_word:
             try:
                 member = bot.get_chat_member(chat_id, msg.from_user.id)
                 if member.status not in ['creator', 'administrator']:
                     bot.delete_message(chat_id=chat_id, message_id=msg.message_id)
             except Exception as e:
-                print(f"Error in delete/check: {e}")
+                print(f"Error deleting/checking: {e}")
 
         return "OK", 200
 
