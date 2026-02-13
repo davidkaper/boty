@@ -1,60 +1,57 @@
 import os
+import json
 import asyncio
 from flask import Flask, request
-from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram import Update, Bot
+from telegram.ext import Application
 
 app = Flask(name)
 
-# تنظیمات اصلی
+# دریافت توکن از Environment Variables ورسل
 TOKEN = os.getenv("BOT_TOKEN")
-WEBSITE_URL = "vaxorum.xyz"
-BAD_WORDS = ["کلمه۱", "کلمه۲", "کلمه۳"] # لیست کلمات نامناسب را اینجا کامل کنید
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(f"خوش آمدید به وکسوروم!\nمرجع بازارهای جهانی و سهام آمریکا\n{WEBSITE_URL}")
-
-async def welcome_new_member(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    for member in update.message.new_chat_members:
-        await update.message.reply_text(
-            f"سلام {member.full_name} عزیز به گروه وکسوروم خوش آمدی!\n"
-            f"برای تحلیل‌های روزانه سهام و بیت‌کوین همراه ما باش.\n{WEBSITE_URL}"
-        )
-
-async def filter_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = update.message
-    text = msg.text or msg.caption or ""
+# تابع اصلی پردازش پیام‌ها
+async def process_update(update_dict):
+    application = Application.builder().token(TOKEN).build()
     
-    # بررسی کلمات نامناسب
-    if any(word in text for word in BAD_WORDS):
-        await msg.delete()
-        return
+    # تعریف منطق فیلتر و خوش‌آمدگویی در اینجا
+    bot = application.bot
+    update = Update.de_json(update_dict, bot)
+    
+    if update.message:
+        msg = update.message
+        text = (msg.text or msg.caption or "").lower()
+        
+        # ۱. خوش‌آمدگویی
+        if msg.new_chat_members:
+            for member in msg.new_chat_members:
+                await msg.reply_text(f"سلام {member.full_name} عزیز! به وکسوروم خوش آمدی.\nvaxorum.xyz")
+        
+        # ۲. فیلتر کردن لینک، عکس، فیلم و کلمات (برای غیر ادمین‌ها)
+        bad_words = ["کلمه۱", "کلمه۲"] # لیست خود را اینجا کامل کنید
+        
+        is_media = msg.photo or msg.video or msg.document
+        is_link = "http" in text or "t.me" in text or "@" in text
+        is_bad_word = any(word in text for word in bad_words)
 
-    # حذف پیام‌های حاوی لینک، عکس یا فیلم
-    # این بخش طبق خواسته شما تمام رسانه‌ها را پاک می‌کند
-    if msg.photo or msg.video or msg.document or "http" in text or "@" in text:
-        try:
-            await msg.delete()
-        except Exception as e:
-            print(f"Error deleting: {e}")
+        if is_media or is_link or is_bad_word:
+            try:
+                # بررسی اینکه فرستنده ادمین نباشد (اختیاری)
+                member = await bot.get_chat_member(msg.chat_id, msg.from_user.id)
+                if member.status not in ['creator', 'administrator']:
+                    await msg.delete()
+            except Exception as e:
+                print(f"Error: {e}")
 
-# تنظیمات Flask برای Webhook
 @app.route('/', methods=['POST'])
-async def webhook():
+def webhook():
     if request.method == "POST":
-        application = Application.builder().token(TOKEN).build()
-        
-        # ثبت هندلرها
-        application.add_handler(CommandHandler("start", start))
-        application.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new_member))
-        application.add_handler(MessageHandler(filters.ALL & ~filters.COMMAND, filter_messages))
-        
-        async with application:
-            update = Update.de_json(request.get_json(force=True), application.bot)
-            await application.process_update(update)
-            
+        update_dict = request.get_json(force=True)
+        # اجرای ناهمگام برای جلوگیری از Timeout در ورسل
+        asyncio.run(process_update(update_dict))
         return "ok", 200
+    return "Method Not Allowed", 405
 
 @app.route('/')
 def index():
-    return "Bot is running!"
+    return "Vaxorum Bot is Active!"
