@@ -34,7 +34,18 @@ def webhook():
         # خوش آمدگویی
         if msg.new_chat_members:
             for member in msg.new_chat_members:
-                welcome_text = f"سلام {member.full_name} عزیز به گروه وکسوروم خوش آمدی!\n🌐 vaxorum.xyz"
+                welcome_text = (
+    f"سلام {member.full_name} عزیز 👋\n"
+    "به گروه **وکسوروم** خوش آمدی!\n\n"
+    "اینجا جمع تحلیلگران و علاقه‌مندان به:\n"
+    "• قیمت دلار و ارزهای جهانی\n"
+    "• بیت‌کوین، آلت‌کوین‌ها و بازار کریپتو\n"
+    "• سهام آمریکا (نزدک، S&P500، داوجونز)\n"
+    "• کالاهای جهانی (طلا، نفت، نقره و ...)\n\n"
+    "تحلیل، چارت، خبر و بحث‌های تخصصی منتظرته.\n"
+    "لطفاً قوانین گروه رو رعایت کن و از بحث‌های سازنده لذت ببر!\n\n"
+    "🌐 وب‌سایت: vaxorum.xyz"
+)
                 bot.send_message(chat_id=chat_id, text=welcome_text)
             return "OK", 200
 
