@@ -10,16 +10,8 @@ if not TOKEN:
 
 bot = Bot(token=TOKEN)
 
-BAD_WORDS = [
-    "کص", "جقی", "کیر", "کون", "کونی", "جنده", "جق", "گاییدمت", "گوه", "گوه خوردن",
-    "مادرجنده", "کس ننت", "خواهرجنده", "خار مادر", "کص ننه", "کیرم تو", "کیر خر",
-    "کون گشاد", "کون نشور", "دیوث", "خواهرت", "دخترجنده", "پفیوز", "هرزه", "فاحشه",
-    "کیرم تو کون", "کصکش", "کیرکش", "کونکش", "گوه خور", "کیرم دهنت", "کیر تو کون",
-    "ننه جنده", "آب کیر", "آب کص", "کیرم تو دهن", "کون لیس", "جنده مادر", "کص لیس",
-    "گاییدم", "گاییدنت", "گاییده", "کیرم", "کصم", "کونم", "مادرتو", "خواهرتو",
-    "خارتو", "کیرتو", "کصتو", "کونتو", "کص ننت", "فاحشه‌تون", "کسکش",
-    "حشری", "پورن", "سوپر", "گوساله", "گاو", "حرومزاده", "لاشی", "بی‌شعور", "فیلم سوپر"
-]
+BAD_WORDS = ["کلمه۱", "کلمه۲", "تست"]  # کلمات خودت رو اضافه کن
+
 @app.route('/', methods=['POST'])
 def webhook():
     try:
@@ -38,22 +30,14 @@ def webhook():
         # خوش آمدگویی
         if msg.new_chat_members:
             for member in msg.new_chat_members:
-                welcome_text = (
-    f"سلام {member.full_name} جان! 😊\n"
-    f"به گروه وکسوروم خیلی خوش اومدی 🌟\n"
-    f"اینجا جای خودته، راحت باش و لذت ببر ~\n"
-    f"🌐 vaxorum.xyz"
-)
+                welcome_text = f"سلام {member.full_name} عزیز به گروه وکسوروم خوش آمدی!\n🌐 vaxorum.xyz"
                 bot.send_message(chat_id=chat_id, text=welcome_text)
             return "OK", 200
 
         # فیلتر
         is_media = bool(msg.photo or msg.video or msg.document or msg.animation or msg.voice or msg.video_note)
         is_link = any(sub in text for sub in ["http", "https", "t.me/", "@"])
-        is_bad_word = any(
-        re.search(r'\b' + re.escape(word) + r'\b', text, re.IGNORECASE)
-        for word in BAD_WORDS
-          )
+        is_bad_word = any(word in text for word in BAD_WORDS)
 
         if is_media or is_link or is_bad_word:
             try:
