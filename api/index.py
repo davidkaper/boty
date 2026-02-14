@@ -10,8 +10,12 @@ if not TOKEN:
 
 bot = Bot(token=TOKEN)
 
-BAD_WORDS = ["کلمه۱", "کلمه۲", "تست"]  # کلمات خودت رو اضافه کن
-
+BAD_WORDS = [
+    "لاشی", "کص", "کیر", "کون", "جنده",
+    "کصکش", "کونی", "مادرجنده", "خواهرجنده",
+    "گوه", "جق", "کیرم", "کص ننه", "کون مادرت",
+    "کسکش", "جاکش", "حرومزاده", "پورن", "گاییدمت", "فیلم سوپر", "کسشر", "مادر قبحه", "کص ننت", "زن جنده", "گاییدم", "دیوس", "بی ناموس" , "ننت", "حشری", "جقی", "شهوتی"
+]
 @app.route('/', methods=['POST'])
 def webhook():
     try:
@@ -37,7 +41,8 @@ def webhook():
         # فیلتر
         is_media = bool(msg.photo or msg.video or msg.document or msg.animation or msg.voice or msg.video_note)
         is_link = any(sub in text for sub in ["http", "https", "t.me/", "@"])
-        is_bad_word = any(word in text for word in BAD_WORDS)
+        words = text.split()  # تقسیم بر اساس فاصله‌ها
+        is_bad_word = any(bad_word in words for bad_word in BAD_WORDS)
 
         if is_media or is_link or is_bad_word:
             try:
