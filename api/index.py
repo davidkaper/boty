@@ -50,6 +50,7 @@ def webhook():
             return "OK", 200
 
         # فیلتر
+        is_too_long = len(text) > 600
         is_media = bool(msg.photo or msg.video or msg.document or msg.animation or msg.voice or msg.video_note)
         is_link = any(sub in text for sub in ["http", "https", "t.me/", "@"])
         words = text.split()  # تقسیم بر اساس فاصله‌ها
