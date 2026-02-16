@@ -50,7 +50,7 @@ def webhook():
             return "OK", 200
 
         # فیلتر
-        is_too_long = len(text) > 600
+        is_too_long = len(text) > 800
         is_media = bool(msg.photo or msg.video or msg.document or msg.animation or msg.voice or msg.video_note)
         is_link = any(sub in text for sub in ["http", "https", "t.me/", "@"])
         words = text.split()  # تقسیم بر اساس فاصله‌ها
@@ -61,6 +61,13 @@ def webhook():
                 member = bot.get_chat_member(chat_id, msg.from_user.id)
                 if member.status not in ['creator', 'administrator']:
                     bot.delete_message(chat_id=chat_id, message_id=msg.message_id)
+            if is_too_long:
+                        bot.send_message(
+                            chat_id=chat_id,
+                            text=f"پیام شما حذف شد {msg.from_user.first_name} عزیز\n"
+                                 f"طول پیام بیش از ۸۰۰ کاراکتر بود ({len(text)} کاراکتر)"
+                        )
+            
             except Exception as e:
                 print(f"Error deleting/checking: {e}")
 
