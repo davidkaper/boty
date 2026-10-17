@@ -35,9 +35,9 @@ button{font-family:inherit;cursor:pointer}
 .err .tech{display:block;font-size:.55em;font-weight:normal;color:#8A5A55;direction:ltr;text-align:left;margin-top:4px;word-break:break-all}
 .empty{text-align:center;color:#444;margin-top:16px;line-height:1.9}
 footer{padding:8px 10px 10px;background:#fff;border-top:2px solid #D8D0BF}
-#mainBtn{display:block;width:100%;min-height:84px;font-size:26px;font-weight:bold;border:0;border-radius:18px;color:#fff;background:#2E9E5B;box-shadow:0 3px 0 rgba(0,0,0,.25);touch-action:none}
-#mainBtn[data-mode=rec]{background:#C0392B;box-shadow:none;-webkit-transform:translateY(3px);transform:translateY(3px)}
-#mainBtn[data-mode=wait]{background:#8A8A8A;animation:blink 1.3s infinite ease-in-out}
+#mainBtn,#imgBtn{display:block;width:100%;min-height:84px;font-size:26px;font-weight:bold;border:0;border-radius:18px;color:#fff;background:#2E9E5B;box-shadow:0 3px 0 rgba(0,0,0,.25);touch-action:none}
+#mainBtn[data-mode=rec],#imgBtn[data-mode=rec]{background:#C0392B;box-shadow:none;-webkit-transform:translateY(3px);transform:translateY(3px)}
+#mainBtn[data-mode=wait],#imgBtn[data-mode=wait]{background:#8A8A8A;animation:blink 1.3s infinite ease-in-out}
 .think{display:flex;align-items:center;gap:12px;margin:0 0 8px;padding:10px 14px;border-radius:14px;background:#FFF1CF;border:2px solid #D9822B;color:#6B4A10;font-size:.7em;font-weight:bold}
 .think .dots{display:flex;gap:6px}
 .think .dots i{display:block;width:12px;height:12px;border-radius:50%;background:#D9822B;animation:bnc 1.2s infinite ease-in-out both}
@@ -65,6 +65,23 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
 .row button{flex:1;padding:14px;font-size:17px;font-weight:bold;border:0;border-radius:12px;background:#1F3A5F;color:#fff}
 .row button.sec{background:#D8D0BF;color:#222}
 #modelInfo{font-size:12px;color:#555;direction:ltr;text-align:left;margin-top:6px;word-break:break-all}
+#cam{flex:none;height:36px;padding:0 12px;font-size:15px;font-weight:bold;border:2px solid #1F3A5F;background:#fff;color:#1F3A5F;border-radius:12px}
+#imgView{display:none;position:fixed;left:0;top:0;right:0;bottom:0;background:#FAF6EE;z-index:9;flex-direction:column}
+#imgView.open{display:-webkit-flex;display:flex}
+#imgTop{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#EFE9DC;border-bottom:4px solid #999;font-size:18px;font-weight:bold}
+#imgTop span{flex:1}
+#imgBack{height:40px;padding:0 14px;font-size:16px;font-weight:bold;border:2px solid #1F3A5F;background:#fff;color:#1F3A5F;border-radius:12px}
+#imgBody{flex:1;overflow-y:auto;padding:10px;-webkit-overflow-scrolling:touch;font-size:22px;line-height:1.85}
+#imgHelp{font-size:.7em;color:#444;margin-bottom:10px;line-height:1.8}
+.pick{display:flex;gap:10px;margin-bottom:10px}
+.pick button{flex:1;min-height:64px;font-size:19px;font-weight:bold;border:3px solid #1F3A5F;background:#fff;color:#1F3A5F;border-radius:16px}
+#prevBox{display:none;margin-bottom:10px;text-align:center}
+#prevBox img,.out img{max-width:100%;border-radius:12px;border:2px solid #1B1B1B}
+#prevBox img{max-height:240px}
+#prevBox button,.out .again{margin-top:6px;padding:8px 14px;font-size:.7em;font-weight:bold;border:2px solid #C0392B;background:#fff;color:#C0392B;border-radius:10px}
+.out .save{display:block;margin:8px 0;padding:12px;text-align:center;font-size:.8em;font-weight:bold;border-radius:12px;background:#1F3A5F;color:#fff;text-decoration:none}
+#imgFoot{padding:8px 10px 10px;background:#fff;border-top:2px solid #D8D0BF}
+#imgStatus{font-size:15px;margin-bottom:6px;text-align:center}
 </style>
 </head>
 <body>
@@ -72,6 +89,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
 <div id="banner" data-state="idle">
   <div id="dot"></div>
   <div id="status">دکمه را نگه دارید و صحبت کنید</div>
+  <button id="cam" type="button">📷 تصویر</button>
   <button id="gear" type="button">تنظیمات</button>
 </div>
 
@@ -87,6 +105,19 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   <source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAM4bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAmJ0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAEAAAABAAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAAAAABAAAAAAHabWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAKABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABhW1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAUVzdGJsAAAAuXN0c2QAAAAAAAAAAQAAAKlhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEAAQABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAAL2F2Y0MBQsAK/+EAF2dCwArZBCbARAAAAwAEAAADACg8SJkgAQAFaMuDyyAAAAAQcGFzcAAAAAEAAAABAAAAFGJ0cnQAAAAAAAAVwAAAFcAAAAAYc3R0cwAAAAAAAAABAAAABQAACAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAABQAAAAEAAAAoc3RzegAAAAAAAAAAAAAABQAAAo8AAAAKAAAACwAAAAoAAAAKAAAAFHN0Y28AAAAAAAAAAQAAA2gAAABidWR0YQAAAFptZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAAAC1pbHN0AAAAJal0b28AAAAdZGF0YQAAAAEAAAAATGF2ZjYwLjE2LjEwMAAAAAhmcmVlAAACwG1kYXQAAAJwBgX//2zcRem95tlIt5Ys2CDZI+7veDI2NCAtIGNvcmUgMTY0IHIzMTA4IDMxZTE5ZjkgLSBILjI2NC9NUEVHLTQgQVZDIGNvZGVjIC0gQ29weWxlZnQgMjAwMy0yMDIzIC0gaHR0cDovL3d3dy52aWRlb2xhbi5vcmcveDI2NC5odG1sIC0gb3B0aW9uczogY2FiYWM9MCByZWY9MyBkZWJsb2NrPTE6MDowIGFuYWx5c2U9MHgxOjB4MTExIG1lPWhleCBzdWJtZT03IHBzeT0xIHBzeV9yZD0xLjAwOjAuMDAgbWl4ZWRfcmVmPTEgbWVfcmFuZ2U9MTYgY2hyb21hX21lPTEgdHJlbGxpcz0xIDh4OGRjdD0wIGNxbT0wIGRlYWR6b25lPTIxLDExIGZhc3RfcHNraXA9MSBjaHJvbWFfcXBfb2Zmc2V0PS0yIHRocmVhZHM9MSBsb29rYWhlYWRfdGhyZWFkcz0xIHNsaWNlZF90aHJlYWRzPTAgbnI9MCBkZWNpbWF0ZT0xIGludGVybGFjZWQ9MCBibHVyYXlfY29tcGF0PTAgY29uc3RyYWluZWRfaW50cmE9MCBiZnJhbWVzPTAgd2VpZ2h0cD0wIGtleWludD0yNTAga2V5aW50X21pbj01IHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAAF2WIhAR8mKAANiMnJyddddddddddddeAAAAABkGaOAj4RgAAAAdBmlQCPhGAAAAABkGaYBDwjAAAAAZBmoA/wjA=" type="video/mp4">
   <source src="data:video/webm;base64,GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAJKEU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHYTbuMU6uEElTDZ1OsggEeTbuMU6uEHFO7a1OsggI07AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsirXsYMPQkBNgI1MYXZmNjAuMTYuMTAwV0GNTGF2ZjYwLjE2LjEwMESJiECPQAAAAAAAFlSua8GuAQAAAAAAADjXgQFzxYiCtj2NNV4i/pyBACK1nIN1bmSIgQCGhVZfVlA4g4EBI+ODhAvrwgDgibCBQLqBQJqBAhJUw2f8c3OgY8CAZ8iaRaOHRU5DT0RFUkSHjUxhdmY2MC4xNi4xMDBzc9ZjwItjxYiCtj2NNV4i/mfIoUWjh0VOQ09ERVJEh5RMYXZjNjAuMzEuMTAyIGxpYnZweGfIoUWjiERVUkFUSU9ORIeTMDA6MDA6MDEuMDAwMDAwMDAwAB9DtnVAj+eBAKOqgQAAgPACAJ0BKkAAQAAARwiFhYiFhIgCAgAGcDxCYAqyIPcwAP7/q1CAo5aBAMgA0QEAARAQABgAGFgv9AAIjoAAo5aBAZAA0QEAARAQABgAGFgv9AAIjoAAo5aBAlgA0QEAARAQABgAGFgv9AAIjoAAo5aBAyAA0QEAARAQABgAGFgv9AAIjoAAHFO7a5G7j7OBALeK94EB8YIBn/CBAw==" type="video/webm">
 </video>
+
+<div id="imgView">
+  <div id="imgTop"><span>ساخت و ویرایش تصویر</span><button id="imgBack" type="button">بازگشت</button></div>
+  <div id="imgBody">
+    <div id="imgHelp">اگر عکسی دارید، اول آن را بگیرید یا از گالری انتخاب کنید. بعد دکمهٔ سبز پایین را نگه دارید و بگویید چه می‌خواهید.<br>مثلاً: «این دارو برای چیست؟» یا «رنگ این گل را آبی کن» یا «یک باغ پر از گل بساز».</div>
+    <div class="pick"><button id="pickCam" type="button">📷 گرفتن عکس</button><button id="pickGal" type="button">🖼 از گالری</button></div>
+    <div id="prevBox"><img id="prevImg" alt=""><br><button id="prevDel" type="button">حذف عکس</button></div>
+    <div id="imgOut"></div>
+  </div>
+  <div id="imgFoot"><div id="imgStatus"></div><button id="imgBtn" type="button" data-mode="idle">نگه دارید و صحبت کنید</button></div>
+  <input type="file" id="fCam" accept="image/*" capture="environment" style="display:none">
+  <input type="file" id="fGal" accept="image/*" style="display:none">
+</div>
 
 <div id="settings">
   <h2>تنظیمات</h2>
@@ -128,6 +159,15 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     <div class="row"><button id="listBtn" type="button" class="sec">دریافت فهرست مدل‌های مجاز کلید</button></div>
     <div id="modelInfo"></div>
 
+    <label for="gkey">کلید API جمینای (فقط برای بخش تصویر)</label>
+    <input id="gkey" type="password" autocomplete="off" placeholder="AIza...">
+
+    <label for="gText">مدل جمینای برای فهمیدن صدا و عکس</label>
+    <input id="gText" type="text">
+
+    <label for="gImg">مدل‌های ساخت تصویر (با کاما جدا کنید)</label>
+    <input id="gImg" type="text">
+
     <label for="sys">دستور سیستم</label>
     <textarea id="sys"></textarea>
   </details>
@@ -142,9 +182,10 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
 <script>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
-  var S = { ctx:null, stream:null, src:null, proc:null, state:'idle', history:[], token:0, awake:false, wl:null, holding:false, rec:null, micPending:false };
-  var DEFAULT_SYS = 'تو یک دستیار صوتی با نام پروفسور هستی. کاربر سؤالش را با صدا می‌پرسد و تو پاسخ را به صورت نوشته می‌دهی تا او بخواند. همیشه به زبان فارسی جواب بده.  جمله‌ها ساده و روان باشند و از کلمات سخت، اصطلاحات فنی و کلمات انگلیسی پرهیز کن.';
-  var EXTRA_SYS = '\nمتن کاربر از روی صدا نوشته شده و ممکن است اشتباه باشد. فقط متن ساده بنویس، بدون ستاره و ایموجی.';  var CFG = { key:'', sttModel:'whisper-large-v3', sttLang:'fa', chatModel:'openai/gpt-oss-120b', fallbackModel:'qwen/qwen3.8-27b,openai/gpt-oss-20b', sys:DEFAULT_SYS, fs:2 };
+  var S = { ctx:null, stream:null, src:null, proc:null, state:'idle', history:[], token:0, awake:false, wl:null, holding:false, rec:null, micPending:false, mode:'chat', photo:null };
+  var DEFAULT_SYS = 'تو یک دستیار مهربان و صبور برای یک فرد سالمند هستی. کاربر سؤالش را با صدا می‌پرسد و تو پاسخ را به صورت نوشته می‌دهی تا او بخواند. همیشه به همان زبانی که کاربر صحبت می‌کند جواب بده. با احترام و صمیمیت صحبت کن. جواب‌ها کامل، روشن و مفید باشند، نه خیلی کوتاه. موضوع را با مثال یا توضیح کافی بگو؛ معمولاً بین پنج تا پانزده جمله، و اگر سؤال مهم یا پیچیده بود بیشتر. جمله‌ها ساده و روان باشند و از کلمات سخت، اصطلاحات فنی و کلمات انگلیسی پرهیز کن؛ اگر ناچار شدی، معنی‌اش را ساده بگو. جواب را در چند بند کوتاه بنویس و بین بندها یک خط خالی بگذار تا خواندنش راحت باشد. اگر سؤال مراحل داشت، مراحل را به ترتیب و با شمارهٔ ۱، ۲، ۳ بنویس. اگر سؤال پزشکی بود، اطلاعات کلی و کامل بده و توصیه کن با پزشک مشورت کند؛ اگر نشانهٔ وضعیت اضطراری بود (مثل درد قفسهٔ سینه، تنگی نفس، بیهوشی یا خونریزی شدید) فوراً و در همان ابتدای جواب بگو با اورژانس تماس بگیرد یا از اطرافیان کمک بخواهد. اگر صحبت از پول، رمز کارت یا اطلاعات شخصی بود، هشدار بده که آن‌ها را به هیچ‌کس نگوید.';
+  var EXTRA_SYS = '\nمتن پیام کاربر از روی صدای او نوشته شده و ممکن است چند کلمه‌اش اشتباه باشد؛ منظور او را حدس بزن. فقط متن ساده بنویس: بدون مارک‌داون، بدون ستاره، بدون علامت‌های ویژه و بدون ایموجی. سؤال کاربر را تکرار نکن و فقط خود پاسخ را بنویس.';
+  var CFG = { key:'', sttModel:'whisper-large-v3', sttLang:'fa', chatModel:'openai/gpt-oss-120b', fallbackModel:'qwen/qwen3.8-27b,openai/gpt-oss-20b', sys:DEFAULT_SYS, fs:2, gkey:'', gText:'gemini-3.1-flash-lite', gImg:'gemini-3.1-flash-image,gemini-2.5-flash-image' };
   var FS = [18, 22, 26, 30, 34, 38];
   var DIG = ['۱','۲','۳','۴','۵','۶'];
   var API = 'https://api.groq.com/openai/v1/';
@@ -169,6 +210,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     $('chatModel').value = CFG.chatModel;
     $('fbModel').value = CFG.fallbackModel;
     $('sys').value = CFG.sys;
+    $('gkey').value = CFG.gkey; $('gText').value = CFG.gText; $('gImg').value = CFG.gImg;
   }
   function readForm(){
     CFG.key = $('key').value.replace(/\s/g,'');
@@ -177,6 +219,9 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     CFG.chatModel = $('chatModel').value.replace(/\s/g,'') || 'openai/gpt-oss-120b';
     CFG.fallbackModel = $('fbModel').value.replace(/\s/g,'');
     CFG.sys = $('sys').value || DEFAULT_SYS;
+    CFG.gkey = $('gkey').value.replace(/\s/g,'');
+    CFG.gText = $('gText').value.replace(/\s/g,'') || 'gemini-3.1-flash-lite';
+    CFG.gImg = $('gImg').value.replace(/\s/g,'') || 'gemini-3.1-flash-image,gemini-2.5-flash-image';
   }
   function saveCfg(){ try{ localStorage.setItem('vc_cfg_groq', JSON.stringify(CFG)); }catch(e){} }
   function applyFs(){
@@ -222,7 +267,8 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     else if(s === 'thinking'){ b.textContent = 'لطفاً کمی صبر کنید'; b.setAttribute('data-mode','wait'); }
     else { b.textContent = 'نگه دارید و صحبت کنید'; b.setAttribute('data-mode','idle'); }
     if(s !== 'listening') setLevel(0);
-    if(s === 'thinking' && !custom) showThinking(); else hideThinking();
+    var ib = $('imgBtn'); ib.textContent = b.textContent; ib.setAttribute('data-mode', b.getAttribute('data-mode')); $('imgStatus').textContent = $('status').textContent;
+    if(s === 'thinking' && !custom && S.mode === 'chat') showThinking(); else hideThinking();
   }
   function setLevel(v){
     var sc = 1 + Math.min(v * 7, 0.7);
@@ -248,8 +294,8 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     var d = document.createElement('div');
     d.className = 'note';
     d.appendChild(document.createTextNode(text));
-    $('log').appendChild(d);
-    scrollDown();
+    if(S.mode === 'img'){ d.style.fontSize = '.85em'; $('imgOut').innerHTML = ''; $('imgOut').appendChild(d); }
+    else { $('log').appendChild(d); scrollDown(); }
   }
   function friendly(e){
     var m = (e && e.message) || String(e), st = e && e.status;
@@ -261,15 +307,15 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     if(st === 401 || st === 400 || st === 403 || st === 404) return 'مشکلی در تنظیمات برنامه هست (کلید یا نام مدل). از اطرافیان کمک بگیرید.';
     return 'خطایی پیش آمد. دوباره امتحان کنید.';
   }
-  function addErr(e){
+  function addErr(e, box){
     dropEmpty();
     var d = document.createElement('div');
     d.className = 'err';
     d.appendChild(document.createTextNode(friendly(e)));
     var t = document.createElement('span'); t.className = 'tech'; t.textContent = (e && e.message) || String(e);
     d.appendChild(t);
-    $('log').appendChild(d);
-    scrollDown();
+    if(box){ box.innerHTML = ''; box.appendChild(d); }
+    else { $('log').appendChild(d); scrollDown(); }
   }
 
   /* ---------- sounds, vibration, thinking indicator ---------- */
@@ -475,7 +521,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   function press(){
     if(S.holding) return;
     if(S.state === 'thinking') return;
-    if(!CFG.key){ openSettings(true); return; }
+    if(S.mode === 'img' ? !CFG.gkey : !CFG.key){ openSettings(true); return; }
     try{ ensureCtx(); }catch(e){ addErr(e); return; }
     keepAwake();
     S.holding = true;
@@ -510,7 +556,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
       setState('idle');
       return;
     }
-    handle(r.chunks, r.sr, r.tk);
+    if(S.mode === 'img') handleImg(r.chunks, r.sr, r.tk); else handle(r.chunks, r.sr, r.tk);
   }
 
   function handle(chunks, sr, tk){
@@ -543,7 +589,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
 
   function fail(e){
     hideThinking();
-    addErr(e); sndErr();
+    addErr(e, S.mode === 'img' ? $('imgOut') : null); sndErr();
     S.token++; S.holding = false;
     if(S.rec) endRecording();
     setState('idle');
@@ -559,6 +605,143 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   btn.addEventListener('contextmenu', function(e){ e.preventDefault(); }, false);
   btn.addEventListener('keydown', function(e){ if((e.key === ' ' || e.key === 'Enter') && !e.repeat){ e.preventDefault(); press(); } }, false);
   btn.addEventListener('keyup', function(e){ if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); release(); } }, false);
+
+  /* ---------- بخش تصویر (فقط جمینای) ---------- */
+  var GEM = 'https://generativelanguage.googleapis.com/v1beta/models/';
+  var IMG_SYS = 'پیام کاربر یک فایل صوتی است و ممکن است همراهش یک عکس باشد. خروجی را فقط به صورت JSON با این کلیدها بده: "heard" (متن دقیق حرف کاربر)، "mode" (فقط یکی از دو مقدار draw یا explain)، "prompt" و "reply". اگر کاربر می‌خواهد تصویری ساخته شود یا عکس همراه تغییر کند، mode را draw بگذار و در prompt یک دستور کامل و دقیق به انگلیسی برای ساخت یا ویرایش تصویر بنویس (اگر عکس هست، فقط تغییر خواسته‌شده را بگو و بنویس بقیهٔ عکس همان بماند) و reply را خالی بگذار. اگر کاربر دربارهٔ عکس یا چیز دیگری سؤال دارد یا توضیح می‌خواهد، mode را explain بگذار و در reply به فارسی ساده، روشن، بدون مارک‌داون و بدون ایموجی جواب بده. اگر عکس دارو یا قرص یا مسئلهٔ پزشکی است، اطلاعات کلی بده و بگو حتماً از پزشک یا داروساز هم بپرسد. اگر صدا ساکت یا نامفهوم بود heard را خالی بگذار و در reply مودبانه بخواه دوباره بگوید.';
+  function toBase64(u8){
+    var s = '', step = 0x4000;
+    for(var i = 0; i < u8.length; i += step){
+      s += String.fromCharCode.apply(null, Array.prototype.slice.call(u8.subarray(i, i + step)));
+    }
+    return btoa(s);
+  }
+  function gcall(model, body){
+    if(!CFG.gkey) return Promise.reject(new Error('کلید API جمینای وارد نشده است.'));
+    return fetch(GEM + model + ':generateContent', {
+      method:'POST', headers:{ 'Content-Type':'application/json', 'x-goog-api-key': CFG.gkey }, body: JSON.stringify(body)
+    }).then(function(r){
+      return r.json().then(function(j){
+        if(!r.ok){
+          var er = new Error(((j && j.error && j.error.message) || ('خطای ' + r.status)) + ' [' + model + ']');
+          er.status = r.status; throw er;
+        }
+        return j;
+      }, function(){ var er = new Error('پاسخ نامعتبر از سرور (' + r.status + ') [' + model + ']'); er.status = r.status; throw er; });
+    }, function(){ throw new Error('اتصال برقرار نشد.'); });
+  }
+  function gtry(models, body){
+    var list = uniq((models || '').split(',')), idx = 0;
+    function one(m, n){
+      return gcall(m, body).then(null, function(e){
+        if(isBusy(e) && n < 2) return sleep(1500).then(function(){ return one(m, n + 1); });
+        throw e;
+      });
+    }
+    function next(){
+      return one(list[idx], 1).then(null, function(e){
+        if(canSkip(e) && idx < list.length - 1){ idx++; return next(); }
+        throw e;
+      });
+    }
+    return next();
+  }
+  function gparts(j){ return (j && j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || []; }
+  function gtext(j){
+    var p = gparts(j), t = '';
+    for(var i = 0; i < p.length; i++) if(p[i].text && !p[i].thought) t += p[i].text;
+    return t;
+  }
+  function gimage(j){
+    var p = gparts(j);
+    for(var i = 0; i < p.length; i++){
+      var d = p[i].inlineData || p[i].inline_data;
+      if(d && d.data) return { mime: d.mimeType || d.mime_type || 'image/png', b64: d.data };
+    }
+    return null;
+  }
+  function parseImgReply(txt){
+    var c = String(txt || '').replace(/^\s*```(?:json)?/i, '').replace(/```\s*$/, '').replace(/^\s+|\s+$/g, ''), o = null;
+    try{ o = JSON.parse(c); }catch(e){}
+    if(o && typeof o === 'object') return { heard:String(o.heard || ''), mode:(o.mode === 'draw' ? 'draw' : 'explain'), prompt:String(o.prompt || ''), reply:String(o.reply || '') };
+    return { heard:'', mode:'explain', prompt:'', reply:c };
+  }
+  function setPhoto(b64, mime){
+    S.photo = b64 ? { b64:b64, mime:mime } : null;
+    if(S.photo){ $('prevImg').src = 'data:' + mime + ';base64,' + b64; $('prevBox').style.display = 'block'; $('imgOut').innerHTML = ''; }
+    else { $('prevImg').removeAttribute('src'); $('prevBox').style.display = 'none'; }
+  }
+  function loadPhoto(file){
+    if(!file) return;
+    var U = window.URL || window.webkitURL, url = U.createObjectURL(file), im = new Image();
+    im.onload = function(){
+      var sc = Math.min(1, 1024 / Math.max(im.width, im.height));
+      var c = document.createElement('canvas'); c.width = Math.round(im.width * sc); c.height = Math.round(im.height * sc);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      var d = c.toDataURL('image/jpeg', 0.85);
+      U.revokeObjectURL(url);
+      setPhoto(d.split(',')[1], 'image/jpeg');
+    };
+    im.onerror = function(){ addErr(new Error('عکس خوانده نشد.'), $('imgOut')); };
+    im.src = url;
+  }
+  function showImgResult(heard, text, img){
+    var out = $('imgOut'), d;
+    out.innerHTML = '';
+    if(heard){ d = document.createElement('div'); d.className = 'msg user'; d.textContent = heard; out.appendChild(d); }
+    if(img){
+      d = document.createElement('div'); d.className = 'msg ai out';
+      var im = document.createElement('img'); im.src = 'data:' + img.mime + ';base64,' + img.b64; d.appendChild(im);
+      var a = document.createElement('a'); a.className = 'save'; a.textContent = 'ذخیرهٔ عکس در گوشی';
+      a.href = im.src; a.setAttribute('download', 'picture.' + (/jpeg/.test(img.mime) ? 'jpg' : 'png')); d.appendChild(a);
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'again'; b.textContent = 'ادامه دادن روی همین عکس';
+      b.onclick = function(){ setPhoto(img.b64, img.mime); };
+      d.appendChild(b); out.appendChild(d);
+    }
+    if(text){ d = document.createElement('div'); d.className = 'msg ai'; d.textContent = text; out.appendChild(d); }
+    out.scrollIntoView ? out.scrollIntoView() : 0;
+  }
+  function handleImg(chunks, sr, tk){
+    setState('thinking');
+    $('imgOut').innerHTML = '';
+    var wav, photo = S.photo, parts = [];
+    try{ wav = toBase64(encodeWav(chunks, sr)); }catch(e){ fail(e); return; }
+    if(photo) parts.push({ inlineData:{ mimeType:photo.mime, data:photo.b64 } });
+    parts.push({ inlineData:{ mimeType:'audio/wav', data:wav } });
+    gtry(CFG.gText, { systemInstruction:{ parts:[{ text:IMG_SYS }] }, contents:[{ role:'user', parts:parts }], generationConfig:{ responseMimeType:'application/json', maxOutputTokens:1500 } }).then(function(j){
+      if(tk !== S.token) throw 'stop';
+      var r = parseImgReply(gtext(j));
+      if(r.mode !== 'draw' || !r.prompt) return { r:r, j2:null };
+      setState('thinking', 'در حال کشیدن تصویر… کمی صبر کنید');
+      var p2 = [{ text:r.prompt }];
+      if(photo) p2.unshift({ inlineData:{ mimeType:photo.mime, data:photo.b64 } });
+      return gtry(CFG.gImg, { contents:[{ role:'user', parts:p2 }], generationConfig:{ responseModalities:['TEXT','IMAGE'] } }).then(function(j2){ return { r:r, j2:j2 }; });
+    }).then(function(x){
+      if(tk !== S.token) return;
+      var r = x.r;
+      if(x.j2){
+        var img = gimage(x.j2);
+        showImgResult(r.heard, img ? gtext(x.j2).replace(/^\s+|\s+$/g, '') : (gtext(x.j2).replace(/^\s+|\s+$/g, '') ? cleanReply(gtext(x.j2)) : 'نتوانستم این تصویر را بسازم. جملهٔ دیگری امتحان کنید.'), img);
+      } else {
+        showImgResult(r.heard, cleanReply(r.reply), null);
+      }
+      setState('reading'); sndDone();
+    }).then(null, function(e){ if(e !== 'stop' && tk === S.token) fail(e); });
+  }
+  var ib = $('imgBtn'), lastT2 = 0;
+  function ipress(){ S.mode = 'img'; press(); }
+  ib.addEventListener('touchstart', function(e){ e.preventDefault(); lastT2 = Date.now(); ipress(); }, false);
+  ib.addEventListener('touchend', function(e){ e.preventDefault(); lastT2 = Date.now(); vib(70); release(); }, false);
+  ib.addEventListener('touchcancel', function(){ lastT2 = Date.now(); release(); }, false);
+  ib.addEventListener('mousedown', function(){ if(Date.now() - lastT2 < 800) return; ipress(); }, false);
+  ib.addEventListener('contextmenu', function(e){ e.preventDefault(); }, false);
+  $('cam').onclick = function(){ S.mode = 'img'; $('imgView').className = 'open'; if(!CFG.gkey) openSettings(true); };
+  $('imgBack').onclick = function(){ S.mode = 'chat'; $('imgView').className = ''; };
+  $('pickCam').onclick = function(){ $('fCam').click(); };
+  $('pickGal').onclick = function(){ $('fGal').click(); };
+  $('fCam').onchange = function(){ loadPhoto(this.files && this.files[0]); this.value = ''; };
+  $('fGal').onchange = function(){ loadPhoto(this.files && this.files[0]); this.value = ''; };
+  $('prevDel').onclick = function(){ setPhoto(null); };
 
   /* ---------- settings screen ---------- */
   function openSettings(advanced){
