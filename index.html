@@ -89,7 +89,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
 <div id="banner" data-state="idle">
   <div id="dot"></div>
   <div id="status">دکمه را نگه دارید و صحبت کنید</div>
-  <button id="cam" type="button">📷 تصویر</button>
+  <button id="cam" type="button">📷 عکس</button>
   <button id="gear" type="button">تنظیمات</button>
 </div>
 
@@ -107,9 +107,9 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
 </video>
 
 <div id="imgView">
-  <div id="imgTop"><span>ساخت و ویرایش تصویر</span><button id="imgBack" type="button">بازگشت</button></div>
+  <div id="imgTop"><span>پرسیدن دربارهٔ عکس</span><button id="imgBack" type="button">بازگشت</button></div>
   <div id="imgBody">
-    <div id="imgHelp">اگر عکسی دارید، اول آن را بگیرید یا از گالری انتخاب کنید. بعد دکمهٔ سبز پایین را نگه دارید و بگویید چه می‌خواهید.<br>مثلاً: «این دارو برای چیست؟» یا «رنگ این گل را آبی کن» یا «یک باغ پر از گل بساز».</div>
+    <div id="imgHelp">۱. عکس را بگیرید یا از گالری انتخاب کنید.<br>۲. دکمهٔ سبز پایین را نگه دارید و بپرسید. مثلاً: «این چیست؟» یا «این دارو برای چیست؟» یا «این نوشته را برایم بخوان».</div>
     <div class="pick"><button id="pickCam" type="button">📷 گرفتن عکس</button><button id="pickGal" type="button">🖼 از گالری</button></div>
     <div id="prevBox"><img id="prevImg" alt=""><br><button id="prevDel" type="button">حذف عکس</button></div>
     <div id="imgOut"></div>
@@ -159,14 +159,8 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     <div class="row"><button id="listBtn" type="button" class="sec">دریافت فهرست مدل‌های مجاز کلید</button></div>
     <div id="modelInfo"></div>
 
-    <label for="gkey">کلید API جمینای (فقط برای بخش تصویر)</label>
-    <input id="gkey" type="password" autocomplete="off" placeholder="AIza...">
-
-    <label for="gText">مدل جمینای برای فهمیدن صدا و عکس</label>
-    <input id="gText" type="text">
-
-    <label for="gImg">مدل‌های ساخت تصویر (با کاما جدا کنید)</label>
-    <input id="gImg" type="text">
+    <label for="vModel">مدل‌های دیدن عکس (با کاما جدا کنید)</label>
+    <input id="vModel" type="text">
 
     <label for="sys">دستور سیستم</label>
     <textarea id="sys"></textarea>
@@ -185,7 +179,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   var S = { ctx:null, stream:null, src:null, proc:null, state:'idle', history:[], token:0, awake:false, wl:null, holding:false, rec:null, micPending:false, mode:'chat', photo:null };
   var DEFAULT_SYS = 'تو یک دستیار صوتی با نام پروفسور هستی. کاربر سؤالش را با صدا می‌پرسد و تو پاسخ را به صورت نوشته می‌دهی تا او بخواند. همیشه به زبان فارسی جواب بده.  جمله‌ها ساده و روان باشند و از کلمات سخت، اصطلاحات فنی و کلمات انگلیسی پرهیز کن.';
    var EXTRA_SYS = '\nمتن کاربر از روی صدا نوشته شده و ممکن است اشتباه باشد. فقط متن ساده بنویس، بدون ستاره و ایموجی.';
-  var CFG = { key:'', sttModel:'whisper-large-v3', sttLang:'fa', chatModel:'openai/gpt-oss-120b', fallbackModel:'qwen/qwen3.8-27b,openai/gpt-oss-20b', sys:DEFAULT_SYS, fs:2, gkey:'', gText:'gemini-3.1-flash-lite', gImg:'gemini-3.1-flash-image,gemini-2.5-flash-image' };
+  var CFG = { key:'', sttModel:'whisper-large-v3', sttLang:'fa', chatModel:'openai/gpt-oss-120b', fallbackModel:'qwen/qwen3.8-27b,openai/gpt-oss-20b', sys:DEFAULT_SYS, fs:2, vModel:'qwen/qwen3.8-27b,qwen/qwen3.6-27b' };
   var FS = [18, 22, 26, 30, 34, 38];
   var DIG = ['۱','۲','۳','۴','۵','۶'];
   var API = 'https://api.groq.com/openai/v1/';
@@ -210,7 +204,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     $('chatModel').value = CFG.chatModel;
     $('fbModel').value = CFG.fallbackModel;
     $('sys').value = CFG.sys;
-    $('gkey').value = CFG.gkey; $('gText').value = CFG.gText; $('gImg').value = CFG.gImg;
+    $('vModel').value = CFG.vModel;
   }
   function readForm(){
     CFG.key = $('key').value.replace(/\s/g,'');
@@ -219,9 +213,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     CFG.chatModel = $('chatModel').value.replace(/\s/g,'') || 'openai/gpt-oss-120b';
     CFG.fallbackModel = $('fbModel').value.replace(/\s/g,'');
     CFG.sys = $('sys').value || DEFAULT_SYS;
-    CFG.gkey = $('gkey').value.replace(/\s/g,'');
-    CFG.gText = $('gText').value.replace(/\s/g,'') || 'gemini-3.1-flash-lite';
-    CFG.gImg = $('gImg').value.replace(/\s/g,'') || 'gemini-3.1-flash-image,gemini-2.5-flash-image';
+    CFG.vModel = $('vModel').value.replace(/\s/g,'') || 'qwen/qwen3.8-27b,qwen/qwen3.6-27b';
   }
   function saveCfg(){ try{ localStorage.setItem('vc_cfg_groq', JSON.stringify(CFG)); }catch(e){} }
   function applyFs(){
@@ -301,7 +293,6 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     var m = (e && e.message) || String(e), st = e && e.status;
     if(/کلید API/.test(m)) return 'برنامه هنوز تنظیم نشده است. از یکی از اطرافیان بخواهید آن را تنظیم کند.';
     if(/اجازهٔ میکروفون/.test(m)) return 'اجازهٔ میکروفون داده نشده است. از یکی از اطرافیان کمک بگیرید.';
-    if(/location is not supported/i.test(m)) return 'جمینای از این مکان در دسترس نیست. فیلترشکن (VPN) گوشی را روشن کنید و دوباره امتحان کنید.';
     if(/اتصال برقرار نشد/.test(m)) return 'اینترنت وصل نیست. اینترنت گوشی را بررسی کنید و دوباره امتحان کنید.';
     if(st === 503 || st === 500 || st === 502 || st === 504) return 'سرور کمی شلوغ است. چند لحظه بعد دوباره امتحان کنید.';
     if(st === 429) return 'فعلاً تعداد درخواست‌ها زیاد شده است. چند دقیقه صبر کنید و دوباره امتحان کنید.';
@@ -522,7 +513,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   function press(){
     if(S.holding) return;
     if(S.state === 'thinking') return;
-    if(S.mode === 'img' ? !CFG.gkey : !CFG.key){ openSettings(true); return; }
+    if(!CFG.key){ openSettings(true); return; }
     try{ ensureCtx(); }catch(e){ addErr(e); return; }
     keepAwake();
     S.holding = true;
@@ -607,65 +598,40 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   btn.addEventListener('keydown', function(e){ if((e.key === ' ' || e.key === 'Enter') && !e.repeat){ e.preventDefault(); press(); } }, false);
   btn.addEventListener('keyup', function(e){ if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); release(); } }, false);
 
-  /* ---------- بخش تصویر (فقط جمینای) ---------- */
-  var GEM = 'https://generativelanguage.googleapis.com/v1beta/models/';
-  var IMG_SYS = 'پیام کاربر یک فایل صوتی است و ممکن است همراهش یک عکس باشد. خروجی را فقط به صورت JSON با این کلیدها بده: "heard" (متن دقیق حرف کاربر)، "mode" (فقط یکی از دو مقدار draw یا explain)، "prompt" و "reply". اگر کاربر می‌خواهد تصویری ساخته شود یا عکس همراه تغییر کند، mode را draw بگذار و در prompt یک دستور کامل و دقیق به انگلیسی برای ساخت یا ویرایش تصویر بنویس (اگر عکس هست، فقط تغییر خواسته‌شده را بگو و بنویس بقیهٔ عکس همان بماند) و reply را خالی بگذار. اگر کاربر دربارهٔ عکس یا چیز دیگری سؤال دارد یا توضیح می‌خواهد، mode را explain بگذار و در reply به فارسی ساده، روشن، بدون مارک‌داون و بدون ایموجی جواب بده. اگر عکس دارو یا قرص یا مسئلهٔ پزشکی است، اطلاعات کلی بده و بگو حتماً از پزشک یا داروساز هم بپرسد. اگر صدا ساکت یا نامفهوم بود heard را خالی بگذار و در reply مودبانه بخواه دوباره بگوید.';
-  function toBase64(u8){
-    var s = '', step = 0x4000;
-    for(var i = 0; i < u8.length; i += step){
-      s += String.fromCharCode.apply(null, Array.prototype.slice.call(u8.subarray(i, i + step)));
-    }
-    return btoa(s);
-  }
-  function gcall(model, body){
-    if(!CFG.gkey) return Promise.reject(new Error('کلید API جمینای وارد نشده است.'));
-    return fetch(GEM + model + ':generateContent', {
-      method:'POST', headers:{ 'Content-Type':'application/json', 'x-goog-api-key': CFG.gkey }, body: JSON.stringify(body)
-    }).then(function(r){
-      return r.json().then(function(j){
-        if(!r.ok){
-          var er = new Error(((j && j.error && j.error.message) || ('خطای ' + r.status)) + ' [' + model + ']');
-          er.status = r.status; throw er;
-        }
-        return j;
-      }, function(){ var er = new Error('پاسخ نامعتبر از سرور (' + r.status + ') [' + model + ']'); er.status = r.status; throw er; });
-    }, function(){ throw new Error('اتصال برقرار نشد.'); });
-  }
-  function gtry(models, body){
-    var list = uniq((models || '').split(',')), idx = 0;
-    function one(m, n){
-      return gcall(m, body).then(null, function(e){
-        if(isBusy(e) && n < 2) return sleep(1500).then(function(){ return one(m, n + 1); });
-        throw e;
-      });
+  /* ---------- بخش عکس (Groq) ---------- */
+  var VIS_EXTRA = '\nکاربر یک عکس فرستاده و دربارهٔ آن حرف زده است. عکس را با دقت نگاه کن و به سؤال او جواب بده. اگر در عکس نوشته هست، آن را بخوان. اگر عکس دارو یا قرص است، نام و کاربرد کلی و نکته‌های مهم را بگو و تأکید کن که حتماً از پزشک یا داروساز هم بپرسد و بدون نظر پزشک مصرف نکند. اگر مطمئن نیستی، صادقانه بگو. متن کاربر از روی صدا نوشته شده و ممکن است اشتباه باشد. فقط متن ساده بنویس، بدون ستاره و ایموجی.';
+  function vision(text, photo){
+    var messages = [
+      { role:'system', content: CFG.sys + VIS_EXTRA },
+      { role:'user', content:[ { type:'text', text:text }, { type:'image_url', image_url:{ url:'data:' + photo.mime + ';base64,' + photo.b64 } } ] }
+    ];
+    var list = uniq((CFG.vModel || '').split(',')), idx = 0;
+    function one(m){
+      var n = 0;
+      function go(){
+        n++;
+        return request('chat/completions', {
+          method:'POST', headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify({ model:m, messages:messages, max_completion_tokens:MAX_OUT_TOKENS, temperature:0.5 })
+        }, m).then(null, function(e){
+          if(isBusy(e) && n < 2) return sleep(1200).then(go);
+          throw e;
+        });
+      }
+      return go();
     }
     function next(){
-      return one(list[idx], 1).then(null, function(e){
+      return one(list[idx]).then(null, function(e){
         if(canSkip(e) && idx < list.length - 1){ idx++; return next(); }
         throw e;
       });
     }
-    return next();
-  }
-  function gparts(j){ return (j && j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || []; }
-  function gtext(j){
-    var p = gparts(j), t = '';
-    for(var i = 0; i < p.length; i++) if(p[i].text && !p[i].thought) t += p[i].text;
-    return t;
-  }
-  function gimage(j){
-    var p = gparts(j);
-    for(var i = 0; i < p.length; i++){
-      var d = p[i].inlineData || p[i].inline_data;
-      if(d && d.data) return { mime: d.mimeType || d.mime_type || 'image/png', b64: d.data };
-    }
-    return null;
-  }
-  function parseImgReply(txt){
-    var c = String(txt || '').replace(/^\s*```(?:json)?/i, '').replace(/```\s*$/, '').replace(/^\s+|\s+$/g, ''), o = null;
-    try{ o = JSON.parse(c); }catch(e){}
-    if(o && typeof o === 'object') return { heard:String(o.heard || ''), mode:(o.mode === 'draw' ? 'draw' : 'explain'), prompt:String(o.prompt || ''), reply:String(o.reply || '') };
-    return { heard:'', mode:'explain', prompt:'', reply:c };
+    return next().then(function(j){
+      var m = j.choices && j.choices[0] && j.choices[0].message;
+      var txt = (m && m.content) || '';
+      if(!txt) throw new Error('پاسخی دریافت نشد.');
+      return cleanReply(txt);
+    });
   }
   function setPhoto(b64, mime){
     S.photo = b64 ? { b64:b64, mime:mime } : null;
@@ -677,80 +643,74 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     var U = window.URL || window.webkitURL, url = U.createObjectURL(file), im = new Image();
     function bad(){ addErr(new Error('عکس خوانده نشد.'), $('imgOut')); }
     function raw(){
-      if(file.size > 6000000){ addErr(new Error('عکس خیلی بزرگ است. یک عکس کوچک‌تر انتخاب کنید.'), $('imgOut')); return; }
+      if(file.size > 2800000){ addErr(new Error('عکس خیلی بزرگ است. یک عکس کوچک‌تر انتخاب کنید.'), $('imgOut')); return; }
       var fr = new FileReader();
       fr.onload = function(){ var m = /^data:([^;]+);base64,(.*)$/.exec(String(fr.result)); if(m) setPhoto(m[2], m[1]); else bad(); };
       fr.onerror = bad;
       fr.readAsDataURL(file);
     }
+    function enc(maxDim){
+      var sc = Math.min(1, maxDim / Math.max(im.width, im.height));
+      var w = Math.max(1, Math.round(im.width * sc)), h = Math.max(1, Math.round(im.height * sc));
+      var c = document.createElement('canvas'); c.width = w; c.height = h;
+      var x = c.getContext('2d');
+      x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);
+      x.drawImage(im, 0, 0, w, h);
+      return c.toDataURL('image/png');
+    }
     im.onload = function(){
       try{
-        var sc = Math.min(1, 1000 / Math.max(im.width, im.height));
-        var w = Math.max(1, Math.round(im.width * sc)), h = Math.max(1, Math.round(im.height * sc));
-        var c = document.createElement('canvas'); c.width = w; c.height = h;
-        var x = c.getContext('2d');
-        x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);
-        x.drawImage(im, 0, 0, w, h);
-        var d = c.toDataURL('image/png');
+        var dim = 1000, d = enc(dim);
+        while(d.length > 3300000 && dim > 400){ dim = Math.round(dim * 0.75); d = enc(dim); }
         U.revokeObjectURL(url);
-        if(d.length < 200 || d.indexOf('data:image/png') !== 0){ raw(); return; }
+        if(d.length < 200 || d.indexOf('data:image/png') !== 0 || d.length > 3900000){ raw(); return; }
         setPhoto(d.split(',')[1], 'image/png');
       }catch(e){ raw(); }
     };
     im.onerror = raw;
     im.src = url;
   }
-  function showImgResult(heard, text, img){
+  function showImgResult(heard, text){
     var out = $('imgOut'), d;
     out.innerHTML = '';
     if(heard){ d = document.createElement('div'); d.className = 'msg user'; d.textContent = heard; out.appendChild(d); }
-    if(img){
-      d = document.createElement('div'); d.className = 'msg ai out';
-      var im = document.createElement('img'); im.src = 'data:' + img.mime + ';base64,' + img.b64; d.appendChild(im);
-      var a = document.createElement('a'); a.className = 'save'; a.textContent = 'ذخیرهٔ عکس در گوشی';
-      a.href = im.src; a.setAttribute('download', 'picture.' + (/jpeg/.test(img.mime) ? 'jpg' : 'png')); d.appendChild(a);
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'again'; b.textContent = 'ادامه دادن روی همین عکس';
-      b.onclick = function(){ setPhoto(img.b64, img.mime); };
-      d.appendChild(b); out.appendChild(d);
-    }
-    if(text){ d = document.createElement('div'); d.className = 'msg ai'; d.textContent = text; out.appendChild(d); }
-    out.scrollIntoView ? out.scrollIntoView() : 0;
+    d = document.createElement('div'); d.className = 'msg ai'; d.textContent = text; out.appendChild(d);
+    if(out.scrollIntoView) out.scrollIntoView();
   }
   function handleImg(chunks, sr, tk){
     setState('thinking');
     $('imgOut').innerHTML = '';
-    var wav, photo = S.photo, parts = [];
-    try{ wav = toBase64(encodeWav(chunks, sr)); }catch(e){ fail(e); return; }
-    if(photo) parts.push({ inlineData:{ mimeType:photo.mime, data:photo.b64 } });
-    parts.push({ inlineData:{ mimeType:'audio/wav', data:wav } });
-    gtry(CFG.gText, { systemInstruction:{ parts:[{ text:IMG_SYS }] }, contents:[{ role:'user', parts:parts }], generationConfig:{ responseMimeType:'application/json', maxOutputTokens:1500 } }).then(function(j){
+    var wav, photo = S.photo, heard = '';
+    if(!photo){ addNote('اول یک عکس بگیرید یا از گالری انتخاب کنید.'); setState('idle'); return; }
+    try{ wav = encodeWav(chunks, sr); }catch(e){ fail(e); return; }
+    transcribe(wav).then(function(text){
       if(tk !== S.token) throw 'stop';
-      var r = parseImgReply(gtext(j));
-      if(r.mode !== 'draw' || !r.prompt) return { r:r, j2:null };
-      setState('thinking', 'در حال کشیدن تصویر… کمی صبر کنید');
-      var p2 = [{ text:r.prompt }];
-      if(photo) p2.unshift({ inlineData:{ mimeType:photo.mime, data:photo.b64 } });
-      return gtry(CFG.gImg, { contents:[{ role:'user', parts:p2 }], generationConfig:{ responseModalities:['TEXT','IMAGE'] } }).then(function(j2){ return { r:r, j2:j2 }; });
-    }).then(function(x){
+      heard = text;
+      if(!heard || heard.length < 2) return null;
+      return vision(heard, photo);
+    }).then(function(reply){
       if(tk !== S.token) return;
-      var r = x.r;
-      if(x.j2){
-        var img = gimage(x.j2);
-        showImgResult(r.heard, img ? gtext(x.j2).replace(/^\s+|\s+$/g, '') : (gtext(x.j2).replace(/^\s+|\s+$/g, '') ? cleanReply(gtext(x.j2)) : 'نتوانستم این تصویر را بسازم. جملهٔ دیگری امتحان کنید.'), img);
-      } else {
-        showImgResult(r.heard, cleanReply(r.reply), null);
+      if(reply === null){
+        addNote('نتوانستم حرف شما را بفهمم. لطفاً کمی بلندتر و واضح‌تر دوباره بگویید.');
+        setState('idle');
+        return;
       }
+      showImgResult(heard, reply);
       setState('reading'); sndDone();
     }).then(null, function(e){ if(e !== 'stop' && tk === S.token) fail(e); });
   }
-  var ib = $('imgBtn'), lastT2 = 0;
-  function ipress(){ S.mode = 'img'; press(); }
+    var ib = $('imgBtn'), lastT2 = 0;
+  function ipress(){
+    S.mode = 'img';
+    if(!S.photo && !S.holding && S.state !== 'thinking'){ addNote('اول یک عکس بگیرید یا از گالری انتخاب کنید. بعد دکمهٔ سبز را نگه دارید و دربارهٔ آن بپرسید.'); vib(120); return; }
+    press();
+  }
   ib.addEventListener('touchstart', function(e){ e.preventDefault(); lastT2 = Date.now(); ipress(); }, false);
   ib.addEventListener('touchend', function(e){ e.preventDefault(); lastT2 = Date.now(); vib(70); release(); }, false);
   ib.addEventListener('touchcancel', function(){ lastT2 = Date.now(); release(); }, false);
   ib.addEventListener('mousedown', function(){ if(Date.now() - lastT2 < 800) return; ipress(); }, false);
   ib.addEventListener('contextmenu', function(e){ e.preventDefault(); }, false);
-  $('cam').onclick = function(){ S.mode = 'img'; $('imgView').className = 'open'; if(!CFG.gkey) openSettings(true); };
+  $('cam').onclick = function(){ S.mode = 'img'; $('imgView').className = 'open'; };
   $('imgBack').onclick = function(){ S.mode = 'chat'; $('imgView').className = ''; };
   $('pickCam').onclick = function(){ $('fCam').click(); };
   $('pickGal').onclick = function(){ $('fGal').click(); };
