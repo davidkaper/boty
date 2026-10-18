@@ -151,6 +151,9 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     <label for="sttLang">زبان صدا (fa = فارسی؛ خالی = تشخیص خودکار)</label>
     <input id="sttLang" type="text">
 
+    <label for="sttPrompt">راهنمای دقت تشخیص صدا (اختیاری — جملهٔ فارسی که به مدل کمک می‌کند کلمات را درست بنویسد)</label>
+    <input id="sttPrompt" type="text">
+
     <label for="chatModel">مدل گفتگو</label>
     <input id="chatModel" type="text" list="chatList"><datalist id="chatList"></datalist>
 
@@ -191,8 +194,9 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   var $ = function(id){ return document.getElementById(id); };
   var S = { ctx:null, stream:null, src:null, proc:null, state:'idle', history:[], token:0, awake:false, wl:null, holding:false, rec:null, micPending:false, mode:'chat', photo:null };
   var DEFAULT_SYS = 'تو یک دستیار صوتی با نام پروفسور هستی. کاربر سؤالش را با صدا می‌پرسد و تو پاسخ را به صورت نوشته می‌دهی تا او بخواند. همیشه به زبان فارسی جواب بده.  جمله‌ها ساده و روان باشند و از کلمات سخت، اصطلاحات فنی و کلمات انگلیسی پرهیز کن.';
-   var EXTRA_SYS = '\nمتن کاربر از روی صدا نوشته شده و ممکن است اشتباه باشد. فقط متن ساده بنویس، بدون ستاره و ایموجی.';
-  var CFG = { key:'', sttModel:'whisper-large-v3', sttLang:'fa', chatModel:'openai/gpt-oss-120b', fallbackModel:'qwen/qwen3.8-27b,openai/gpt-oss-20b', sys:DEFAULT_SYS, fs:2, vModel:'qwen/qwen3.8-27b,qwen/qwen3.6-27b', ttsOn:'1', ttsUrl:'https://tts-api-flax-rho.vercel.app', ttsKey:'Key-8f2K9xLm4', ttsVoice:'fa-IR-DilaraNeural' };
+   var EXTRA_SYS = '\nمتن کاربر با تشخیص خودکار گفتار نوشته شده و ممکن است غلط تایپی یا کلمهٔ اشتباه داشته باشد. اول در ذهنت منظور محتمل کاربر را بازسازی کن و بعد جواب بده؛ لازم نیست اشتباه‌ها را گوشزد کنی. فقط متن ساده بنویس، بدون ستاره و ایموجی.';
+  /* نسخهٔ ۲ — بهبود دقت تشخیص صدا: نویزگیر میکروفون + دُم صدا بعد از رها کردن + راهنمای فارسی Whisper */
+  var CFG = { key:'', sttModel:'whisper-large-v3', sttLang:'fa', sttPrompt:'سلام. این یک پرسش کوتاه به زبان فارسی است.', chatModel:'openai/gpt-oss-120b', fallbackModel:'qwen/qwen3.8-27b,openai/gpt-oss-20b', sys:DEFAULT_SYS, fs:2, vModel:'qwen/qwen3.8-27b,qwen/qwen3.6-27b', ttsOn:'1', ttsUrl:'https://tts-api-flax-rho.vercel.app', ttsKey:'Key-8f2K9xLm4', ttsVoice:'fa-IR-DilaraNeural' };
   var FS = [18, 22, 26, 30, 34, 38];
   var DIG = ['۱','۲','۳','۴','۵','۶'];
   var API = 'https://api.groq.com/openai/v1/';
@@ -214,6 +218,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     $('key').value = CFG.key;
     $('sttModel').value = CFG.sttModel;
     $('sttLang').value = CFG.sttLang;
+    $('sttPrompt').value = CFG.sttPrompt || '';
     $('chatModel').value = CFG.chatModel;
     $('fbModel').value = CFG.fallbackModel;
     $('sys').value = CFG.sys;
@@ -227,6 +232,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     CFG.key = $('key').value.replace(/\s/g,'');
     CFG.sttModel = $('sttModel').value.replace(/\s/g,'') || 'whisper-large-v3';
     CFG.sttLang = $('sttLang').value.replace(/\s/g,'');
+    CFG.sttPrompt = $('sttPrompt').value.replace(/^\s+|\s+$/g,'');
     CFG.chatModel = $('chatModel').value.replace(/\s/g,'') || 'openai/gpt-oss-120b';
     CFG.fallbackModel = $('fbModel').value.replace(/\s/g,'');
     CFG.sys = $('sys').value || DEFAULT_SYS;
@@ -382,8 +388,10 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   function getMic(){
     if(S.stream) return Promise.resolve(S.stream);
     var md = navigator.mediaDevices, p;
+    /* نویزگیر و تنظیم خودکار بلندی میکروفون → تشخیص کلمات دقیق‌تر می‌شود */
+    var MIC_WANT = { echoCancellation:true, noiseSuppression:true, autoGainControl:true, channelCount:1 };
     if(md && md.getUserMedia){
-      p = md.getUserMedia({audio:true});
+      p = md.getUserMedia({audio:MIC_WANT});
     } else {
       var legacy = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
       if(!legacy) return Promise.reject(new Error('دسترسی به میکروفون ممکن نیست. صفحه باید با https باز شود.'));
@@ -440,15 +448,30 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
       var fd = new FormData();
       fd.append('file', new Blob([u8], { type:'audio/wav' }), 'audio.wav');
       fd.append('model', CFG.sttModel);
-      fd.append('response_format', 'json');
+      fd.append('response_format', 'verbose_json');
       fd.append('temperature', '0');
       if(CFG.sttLang) fd.append('language', CFG.sttLang);
+      if(CFG.sttPrompt) fd.append('prompt', String(CFG.sttPrompt).slice(0, 400));
       return request('audio/transcriptions', { method:'POST', body:fd }, CFG.sttModel);
     }
     return once().then(null, function(e){
       if(isBusy(e)) return sleep(1200).then(once);
+      /* اگر مدل صوتی روی سرور در دسترس نبود، خودکار با مدل پشتیبان امتحان کن */
+      if(e && e.status === 404 && CFG.sttModel !== 'whisper-large-v3-turbo'){
+        CFG.sttModel = 'whisper-large-v3-turbo';
+        return once();
+      }
       throw e;
-    }).then(function(j){ return String((j && j.text) || '').replace(/^\s+|\s+$/g, ''); });
+    }).then(function(j){
+      var t = String((j && j.text) || '').replace(/^\s+|\s+$/g, '');
+      var segs = (j && j.segments) || [], ns = 0, i;
+      /* اگر خیلی مطمئن نبود که اصلاً صدای انسانی شنیده، خالی برگردان تا از کاربر پرسیده شود */
+      if(t && segs.length){
+        for(i = 0; i < segs.length; i++) ns += (segs[i] && segs[i].no_speech_prob) || 0;
+        if(ns / segs.length > 0.92) return '';
+      }
+      return t;
+    });
   }
 
   /* گفتگو */
@@ -632,14 +655,21 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     S.holding = false;
     if(S.micPending) return;
     if(!S.rec) return;
-    var r = endRecording();
+    /* دُم صدا: ۴۵۰ میلی‌ثانیه بعد از رها کردن هم ضبط ادامه دارد تا آخرین حرف قطع نشود */
+    S.rec.tail = true;
+    setState('thinking', 'صحبت شما گرفته شد…');
+    setTimeout(function(){ finishRec(S.rec); }, 450);
+  }
+  function finishRec(r){
+    if(!r || S.rec !== r) return;
+    var rr = endRecording();
     sndStop();
-    if(r.ms < MIN_MS || r.peak < 0.01){
+    if(rr.ms < MIN_MS || rr.peak < 0.01){
       addNote('صدایی شنیده نشد. دکمه را نگه دارید، حرفتان را بزنید و بعد رها کنید.');
       setState('idle');
       return;
     }
-    if(S.mode === 'img') handleImg(r.chunks, r.sr, r.tk); else handle(r.chunks, r.sr, r.tk);
+    if(S.mode === 'img') handleImg(rr.chunks, rr.sr, rr.tk); else handle(rr.chunks, rr.sr, rr.tk);
   }
 
   function handle(chunks, sr, tk){
@@ -692,7 +722,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   btn.addEventListener('keyup', function(e){ if(e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); release(); } }, false);
 
   /* ---------- بخش عکس (Groq) ---------- */
-  var VIS_EXTRA = '\nکاربر یک عکس فرستاده و دربارهٔ آن حرف زده است. عکس را با دقت نگاه کن و به سؤال او جواب بده. اگر در عکس نوشته هست، آن را بخوان. اگر عکس دارو یا قرص است، نام و کاربرد کلی و نکته‌های مهم را بگو و تأکید کن که حتماً از پزشک یا داروساز هم بپرسد و بدون نظر پزشک مصرف نکند. اگر مطمئن نیستی، صادقانه بگو. متن کاربر از روی صدا نوشته شده و ممکن است اشتباه باشد. فقط متن ساده بنویس، بدون ستاره و ایموجی.';
+  var VIS_EXTRA = '\nکاربر یک عکس فرستاده و دربارهٔ آن حرف زده است. عکس را با دقت نگاه کن و به سؤال او جواب بده. اگر در عکس نوشته هست، آن را بخوان. اگر عکس دارو یا قرص است، نام و کاربرد کلی و نکته‌های مهم را بگو و تأکید کن که حتماً از پزشک یا داروساز هم بپرسد و بدون نظر پزشک مصرف نکند. اگر مطمئن نیستی، صادقانه بگو. متن کاربر با تشخیص خودکار گفتار نوشته شده و ممکن است غلط داشته باشد؛ اول منظور محتمل را بازسازی کن و بعد جواب بده. فقط متن ساده بنویس، بدون ستاره و ایموجی.';
   function vision(text, photo){
     var messages = [
       { role:'system', content: CFG.sys + VIS_EXTRA },
