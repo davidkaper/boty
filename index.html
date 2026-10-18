@@ -20,7 +20,6 @@ button{font-family:inherit;cursor:pointer}
 #banner{display:flex;align-items:center;gap:10px;padding:4px 10px;font-size:18px;font-weight:bold;border-bottom:4px solid #999;background:#EFE9DC;min-height:46px}
 #banner[data-state=listening]{background:#DDF3E4;border-color:#2E9E5B}
 #banner[data-state=thinking]{background:#FFF1CF;border-color:#D9822B}
-#banner[data-state=speaking]{background:#ECE7F6;border-color:#6B5CA5}
 #dot{width:20px;height:20px;border-radius:50%;background:#8A8A8A;flex:none;-webkit-transform:scale(1);transform:scale(1);transition:transform .08s linear}
 #banner[data-state=listening] #dot{background:#2E9E5B}
 #banner[data-state=thinking] #dot{background:#D9822B}
@@ -61,13 +60,13 @@ footer{padding:8px 10px 10px;background:#fff;border-top:2px solid #D8D0BF}
 summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
 #settings label{display:block;font-size:14px;color:#444;margin:10px 0 3px}
 #settings input[type=text],#settings input[type=password],#settings textarea{width:100%;background:#fff;color:#111;border:2px solid #C9C0AB;border-radius:10px;padding:10px;font-family:inherit;font-size:16px;direction:ltr;text-align:left}
+#settings select{width:100%;background:#fff;color:#111;border:2px solid #C9C0AB;border-radius:10px;padding:10px;font-family:inherit;font-size:16px;direction:rtl;text-align:right}
 #settings textarea{direction:rtl;text-align:right;height:140px}
 .row{display:flex;gap:10px;margin-top:10px}
 .row button{flex:1;padding:14px;font-size:17px;font-weight:bold;border:0;border-radius:12px;background:#1F3A5F;color:#fff}
 .row button.sec{background:#D8D0BF;color:#222}
 #modelInfo{font-size:12px;color:#555;direction:ltr;text-align:left;margin-top:6px;word-break:break-all}
 #cam{flex:none;height:36px;padding:0 12px;font-size:15px;font-weight:bold;border:2px solid #1F3A5F;background:#fff;color:#1F3A5F;border-radius:12px}
-#stopSnd{flex:none;height:36px;padding:0 12px;font-size:15px;font-weight:bold;border:2px solid #6B5CA5;background:#fff;color:#4A3D7A;border-radius:12px;display:none}
 #imgView{display:none;position:fixed;left:0;top:0;right:0;bottom:0;background:#FAF6EE;z-index:9;flex-direction:column}
 #imgView.open{display:-webkit-flex;display:flex}
 #imgTop{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#EFE9DC;border-bottom:4px solid #999;font-size:18px;font-weight:bold}
@@ -92,7 +91,6 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   <div id="dot"></div>
   <div id="status">دکمه را نگه دارید و صحبت کنید</div>
   <button id="cam" type="button">📷 عکس</button>
-  <button id="stopSnd" type="button">⏹ قطع صدا</button>
   <button id="gear" type="button">تنظیمات</button>
 </div>
 
@@ -105,9 +103,10 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
 </footer>
 
 <video id="keep" muted loop playsinline webkit-playsinline>
-  <source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAM4bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAmJ0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAEAAAABAAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAAAAABAAAAAAHabWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAKABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABhW1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAUVzdGJsAAAAuXN0c2QAAAAAAAAAAQAAAKlhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEAAQABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAAL2F2Y0MBQsAK/+EAF2dCwArZBCbARAAAAwAEAAADACg8SJkgAQAFaMuDyyAAAAAQcGFzcAAAAAEAAAABAAAAFGJ0cnQAAAAAAAAVwAAAFcAAAAAYc3R0cwAAAAAAAAABAAAABQAACAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAABQAAAAEAAAAoc3RzegAAAAAAAAAAAAAABQAAAo8AAAAKAAAACwAAAAoAAAAKAAAAFHN0Y28AAAAAAAAAAQAAA2gAAABidWR0YQAAAFptZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAAAC1pbHN0AAAAJal0b28AAAAdZGF0YQAAAAEAAAAATGF2ZjYwLjE2LjEwMAAAAAhmcmVlAAACwG1kYXQAAAJwBgX//2zcRem95tlIt5Ys2CDZI+7veDI2NCAtIGNvcmUgMTY0IHIzMTA4IDMxZTE5ZjkgLSBILjI2NC9NUEVHLTQgQVZDIGNvZGVjIC0gQ29weWxlZnQgMjAwMy0yMDIzIC0gaHR0cDovL3d3dy52aWRlb2xhbi5vcmcveDI2NC5odG1sIC0gb3B0aW9uczogY2FiYWM9MCByZWY9MyBkZWJsb2NrPTE6MDowIGFuYWx5c2U9MHgxOjB4MTExIG1lPWhleCBzdWJtZT03IHBzeT0xIHBzeV9yZD0xLjAwOjAuMDAgbWl4ZWRfcmVmPTEgbWVfcmFuZ2U9MTYgY2hyb21hX21lPTEgdGhyZWxsaXM9MSA4eDhkY3Q9MCBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0tMiB0aHJlYWRzPTEgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cnlfY29tcGF0PTAgY29uc3RyYWluZWRfaW50cmE9MCBiZnJhbWVzPTAgd2VpZ2h0cD0wIGtleWludD0yNTAga2V5aW50X21pbj01IHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAAF2WIhAR8mKAANiMnJyddddddddddddeAAAAABkGaOAj4RgAAAAdBmlQCPhGAAAAABkGaYBDwjAAAAAZBmoA/wjA=" type="video/mp4">
-  <source src="data:video/webm;base64,GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAJKEU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHYTbuMU6uEElTDZ1OsggEeTbuMU6uEHFO7a1OsggI07AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsirXsYMPQkBNgI1MYXZmNjAuMTYuMTAwV0GNTGF2ZjYwLjE2LjEwMESJiECPQAAAAAAAFlSua8GuAQAAAAAAADjXgQFzxYiCtj2NNV4i/pyBACK1nIN1bmSIgQCGhVZfVlA4g4EBI+ODhAvrwgDgibCBQLqBQJqBAhJUw2f8c3OgY8CAZ8iaRaOHRU5DT0RFUkSHjUxhdmY2MC4xNi4xMDBzc9ZjwItjxYiCtj2NNV4i/mfIoUWjh0VOQ09ERVJEh5RMYXZjNjAuMzEuMTAyIGxpYnZweGfIoUWjiERVUkFUSU9ORIeTMDA6MDA6MDEuMDAwMDAwMDAwAB9DtnVAj+eBAKOqgQAAgPACAJ0BKkAAQAAARwiFhYiFhIgCAgAGcDxCYAqyIPcwAP7/q1CAo5aBAMgA0QEAARAQABgAGFgv9AAIjoAAo5aBAZAA0QEAARAQABgAGFgv9AAIjoAAo5aBAlgA0QEAARAQABgAGFgv9AAIjoAAHFO7a5G7j7OBALeK94EB8YIBn/CBAw==" type="video/webm">
+  <source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAM4bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAmJ0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAEAAAABAAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAAAAABAAAAAAHabWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAKABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABhW1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAUVzdGJsAAAAuXN0c2QAAAAAAAAAAQAAAKlhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEAAQABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAAL2F2Y0MBQsAK/+EAF2dCwArZBCbARAAAAwAEAAADACg8SJkgAQAFaMuDyyAAAAAQcGFzcAAAAAEAAAABAAAAFGJ0cnQAAAAAAAAVwAAAFcAAAAAYc3R0cwAAAAAAAAABAAAABQAACAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAABQAAAAEAAAAoc3RzegAAAAAAAAAAAAAABQAAAo8AAAAKAAAACwAAAAoAAAAKAAAAFHN0Y28AAAAAAAAAAQAAA2gAAABidWR0YQAAAFptZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAAAC1pbHN0AAAAJal0b28AAAAdZGF0YQAAAAEAAAAATGF2ZjYwLjE2LjEwMAAAAAhmcmVlAAACwG1kYXQAAAJwBgX//2zcRem95tlIt5Ys2CDZI+7veDI2NCAtIGNvcmUgMTY0IHIzMTA4IDMxZTE5ZjkgLSBILjI2NC9NUEVHLTQgQVZDIGNvZGVjIC0gQ29weWxlZnQgMjAwMy0yMDIzIC0gaHR0cDovL3d3dy52aWRlb2xhbi5vcmcveDI2NC5odG1sIC0gb3B0aW9uczogY2FiYWM9MCByZWY9MyBkZWJsb2NrPTE6MDowIGFuYWx5c2U9MHgxOjB4MTExIG1lPWhleCBzdWJtZT03IHBzeT0xIHBzeV9yZD0xLjAwOjAuMDAgbWl4ZWRfcmVmPTEgbWVfcmFuZ2U9MTYgY2hyb21hX21lPTEgdHJlbGxpcz0xIDh4OGRjdD0wIGNxbT0wIGRlYWR6b25lPTIxLDExIGZhc3RfcHNraXA9MSBjaHJvbWFfcXBfb2Zmc2V0PS0yIHRocmVhZHM9MSBsb29rYWhlYWRfdGhyZWFkcz0xIHNsaWNlZF90aHJlYWRzPTAgbnI9MCBkZWNpbWF0ZT0xIGludGVybGFjZWQ9MCBibHVyYXlfY29tcGF0PTAgY29uc3RyYWluZWRfaW50cmE9MCBiZnJhbWVzPTAgd2VpZ2h0cD0wIGtleWludD0yNTAga2V5aW50X21pbj01IHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAAF2WIhAR8mKAANiMnJyddddddddddddeAAAAABkGaOAj4RgAAAAdBmlQCPhGAAAAABkGaYBDwjAAAAAZBmoA/wjA=" type="video/mp4">
+  <source src="data:video/webm;base64,GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAJKEU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHYTbuMU6uEElTDZ1OsggEeTbuMU6uEHFO7a1OsggI07AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsirXsYMPQkBNgI1MYXZmNjAuMTYuMTAwV0GNTGF2ZjYwLjE2LjEwMESJiECPQAAAAAAAFlSua8GuAQAAAAAAADjXgQFzxYiCtj2NNV4i/pyBACK1nIN1bmSIgQCGhVZfVlA4g4EBI+ODhAvrwgDgibCBQLqBQJqBAhJUw2f8c3OgY8CAZ8iaRaOHRU5DT0RFUkSHjUxhdmY2MC4xNi4xMDBzc9ZjwItjxYiCtj2NNV4i/mfIoUWjh0VOQ09ERVJEh5RMYXZjNjAuMzEuMTAyIGxpYnZweGfIoUWjiERVUkFUSU9ORIeTMDA6MDA6MDEuMDAwMDAwMDAwAB9DtnVAj+eBAKOqgQAAgPACAJ0BKkAAQAAARwiFhYiFhIgCAgAGcDxCYAqyIPcwAP7/q1CAo5aBAMgA0QEAARAQABgAGFgv9AAIjoAAo5aBAZAA0QEAARAQABgAGFgv9AAIjoAAo5aBAlgA0QEAARAQABgAGFgv9AAIjoAAo5aBAyAA0QEAARAQABgAGFgv9AAIjoAAHFO7a5G7j7OBALeK94EB8YIBn/CBAw==" type="video/webm">
 </video>
+
 <div id="imgView">
   <div id="imgTop"><span>پرسیدن دربارهٔ عکس</span><button id="imgBack" type="button">بازگشت</button></div>
   <div id="imgBody">
@@ -140,23 +139,6 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     <div id="vibInfo" style="margin-top:8px;font-size:14px;color:#444"></div>
   </div>
 
-  <div class="sect">
-    <h3>خواندن جواب‌ها با صدا (متن به گفتار)</h3>
-    <div class="row" style="margin-top:0">
-      <button id="ttsOn" type="button">روشن</button>
-      <button id="ttsOff" type="button">خاموش</button>
-    </div>
-    <div class="row"><button id="ttsTest" type="button" class="sec">آزمایش صدا</button></div>
-    <div id="ttsInfo" style="margin-top:8px;font-size:14px;color:#444;line-height:1.8"></div>
-    <div style="margin-top:8px;font-size:13px;color:#555;line-height:1.8">اگر «صدای خود گوشی» پیدا نشد: برنامهٔ Google Speech Services (سرویس گفتار گوگل) را از پلی‌استور نصب یا به‌روز کنید و داخل همان برنامه صدای فارسی را دانلود کنید. تا آن موقع صدا از سرویس رایگان غیررسمی گوگل پخش می‌شود که ممکن است در دسترس نباشد. راه سوم: در تنظیمات پیشرفته، یک سرویس صوتی اینترنتی (TTS) با کیفیت بهتر معرفی کنید.</div>
-    <div class="ctl" style="margin-top:10px">
-      <button id="rateDown" type="button" aria-label="آرام‌تر">−</button>
-      <div class="val" id="rateTxt"></div>
-      <button id="rateUp" type="button" aria-label="تندتر">+</button>
-    </div>
-    <div style="text-align:center;font-size:13px;color:#555;margin-top:2px">سرعت خواندن</div>
-  </div>
-
   <details id="adv">
     <summary>تنظیمات پیشرفته (کلید و مدل‌ها) — ویژهٔ کمک‌کننده</summary>
 
@@ -181,20 +163,20 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     <label for="vModel">مدل‌های دیدن عکس (با کاما جدا کنید)</label>
     <input id="vModel" type="text">
 
-    <label for="ttsApi">آدرس سرویس TTS اینترنتی — اختیاری (سازگار با OpenAI، مثل https://api.openai.com/v1)</label>
-    <input id="ttsApi" type="text" placeholder="https://api.openai.com/v1">
-
-    <label for="ttsKey">کلید API سرویس TTS — اختیاری</label>
-    <input id="ttsKey" type="password" autocomplete="off" placeholder="sk-...">
-
-    <label for="ttsModel">مدل TTS (مثل gpt-4o-mini-tts)</label>
-    <input id="ttsModel" type="text">
-
-    <label for="ttsVoice">نام صدای TTS (مثل alloy)</label>
-    <input id="ttsVoice" type="text">
-
     <label for="sys">دستور سیستم</label>
     <textarea id="sys"></textarea>
+
+    <label for="ttsOn">پخش صوتی پاسخ‌ها (خواندن جواب‌ها با صدا)</label>
+    <select id="ttsOn"><option value="1">روشن</option><option value="0">خاموش</option></select>
+
+    <label for="ttsVoice">صدای گوینده</label>
+    <select id="ttsVoice"><option value="fa-IR-DilaraNeural">دیلارا (زن)</option><option value="fa-IR-FaridNeural">فرید (مرد)</option></select>
+
+    <label for="ttsUrl">آدرس سرویس صدا (Vercel)</label>
+    <input id="ttsUrl" type="text" autocomplete="off" placeholder="https://...vercel.app">
+
+    <label for="ttsKey">کلید سرویس صدا</label>
+    <input id="ttsKey" type="password" autocomplete="off">
   </details>
 
   <div class="row">
@@ -203,13 +185,14 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   </div>
   <div class="row"><button id="closeBtn" type="button" class="sec">بستن</button></div>
 </div>
+
 <script>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var S = { ctx:null, stream:null, src:null, proc:null, state:'idle', history:[], token:0, awake:false, wl:null, holding:false, rec:null, micPending:false, mode:'chat', photo:null };
   var DEFAULT_SYS = 'تو یک دستیار صوتی با نام پروفسور هستی. کاربر سؤالش را با صدا می‌پرسد و تو پاسخ را به صورت نوشته می‌دهی تا او بخواند. همیشه به زبان فارسی جواب بده.  جمله‌ها ساده و روان باشند و از کلمات سخت، اصطلاحات فنی و کلمات انگلیسی پرهیز کن.';
    var EXTRA_SYS = '\nمتن کاربر از روی صدا نوشته شده و ممکن است اشتباه باشد. فقط متن ساده بنویس، بدون ستاره و ایموجی.';
-  var CFG = { key:'', sttModel:'whisper-large-v3', sttLang:'fa', chatModel:'openai/gpt-oss-120b', fallbackModel:'qwen/qwen3.8-27b,openai/gpt-oss-20b', sys:DEFAULT_SYS, fs:2, vModel:'qwen/qwen3.8-27b,qwen/qwen3.6-27b', tts:true, ttsApi:'', ttsKey:'', ttsModel:'gpt-4o-mini-tts', ttsVoice:'alloy', trIdx:2 };
+  var CFG = { key:'', sttModel:'whisper-large-v3', sttLang:'fa', chatModel:'openai/gpt-oss-120b', fallbackModel:'qwen/qwen3.8-27b,openai/gpt-oss-20b', sys:DEFAULT_SYS, fs:2, vModel:'qwen/qwen3.8-27b,qwen/qwen3.6-27b', ttsOn:'1', ttsUrl:'https://tts-api-flax-rho.vercel.app', ttsKey:'Key-8f2K9xLm4', ttsVoice:'fa-IR-DilaraNeural' };
   var FS = [18, 22, 26, 30, 34, 38];
   var DIG = ['۱','۲','۳','۴','۵','۶'];
   var API = 'https://api.groq.com/openai/v1/';
@@ -225,7 +208,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
       if(j){ for(k in j){ if(j.hasOwnProperty(k)) CFG[k] = j[k]; } }
     }catch(e){}
     if(!CFG.sys) CFG.sys = DEFAULT_SYS;
-    fillForm(); applyFs(); applyRate();
+    fillForm(); applyFs();
   }
   function fillForm(){
     $('key').value = CFG.key;
@@ -235,10 +218,10 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     $('fbModel').value = CFG.fallbackModel;
     $('sys').value = CFG.sys;
     $('vModel').value = CFG.vModel;
-    $('ttsApi').value = CFG.ttsApi;
-    $('ttsKey').value = CFG.ttsKey;
-    $('ttsModel').value = CFG.ttsModel;
+    $('ttsOn').value = CFG.ttsOn;
     $('ttsVoice').value = CFG.ttsVoice;
+    $('ttsUrl').value = CFG.ttsUrl;
+    $('ttsKey').value = CFG.ttsKey;
   }
   function readForm(){
     CFG.key = $('key').value.replace(/\s/g,'');
@@ -248,10 +231,10 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     CFG.fallbackModel = $('fbModel').value.replace(/\s/g,'');
     CFG.sys = $('sys').value || DEFAULT_SYS;
     CFG.vModel = $('vModel').value.replace(/\s/g,'') || 'qwen/qwen3.8-27b,qwen/qwen3.6-27b';
-    CFG.ttsApi = $('ttsApi').value.replace(/\s/g,'');
+    CFG.ttsOn = $('ttsOn').value;
+    CFG.ttsVoice = $('ttsVoice').value || 'fa-IR-DilaraNeural';
+    CFG.ttsUrl = $('ttsUrl').value.replace(/\s/g,'');
     CFG.ttsKey = $('ttsKey').value.replace(/\s/g,'');
-    CFG.ttsModel = $('ttsModel').value.replace(/\s/g,'') || 'gpt-4o-mini-tts';
-    CFG.ttsVoice = $('ttsVoice').value.replace(/\s/g,'') || 'alloy';
   }
   function saveCfg(){ try{ localStorage.setItem('vc_cfg_groq', JSON.stringify(CFG)); }catch(e){} }
   function applyFs(){
@@ -286,8 +269,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     idle:'دکمه را نگه دارید و صحبت کنید',
     listening:'گوش می‌دهم… حرف بزنید، بعد دکمه را رها کنید',
     thinking:'در حال فکر کردن…',
-    reading:'برای صحبت دکمه را نگه دارید',
-    speaking:'در حال خواندن پاسخ…'
+    reading:'برای صحبت دکمه را نگه دارید'
   };
   function setState(s, custom){
     S.state = s;
@@ -387,172 +369,6 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     var lg = $('log'), stop = function(e){ e.preventDefault(); return false; };
     ['selectstart','contextmenu','copy','cut','dragstart'].forEach(function(n){ lg.addEventListener(n, stop, false); });
   })();
-
-  /* ---------- TTS: خواندن جواب‌ها با صدا ---------- */
-  var RATES = [0.7, 0.8, 0.9, 1, 1.1, 1.2];
-  var TTS = { on:false, q:[], n:0, engine:'', audio:null, cur:null, wd:null, noteShown:false, primed:false, sysVoice:null };
-
-  function ttsSysVoices(){
-    try{ if(!window.speechSynthesis) return []; return speechSynthesis.getVoices() || []; }catch(e){ return []; }
-  }
-  function ttsFindFa(){
-    var vs = ttsSysVoices(), i, v, l;
-    for(i = 0; i < vs.length; i++){
-      v = vs[i];
-      if(!v || !v.lang) continue;
-      l = String(v.lang).toLowerCase().replace('_','-');
-      if(l.indexOf('fa') === 0) return v;
-    }
-    return null;
-  }
-  (function(){
-    if(!window.speechSynthesis) return;
-    var polls = 0, t = setInterval(function(){
-      polls++;
-      if(ttsSysVoices().length || polls > 24) clearInterval(t);
-    }, 500);
-  })();
-
-  function ttsSplit(text, max){
-    var s = String(text).replace(/[#*`>]/g, ' ').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
-    var out = [], i = 0, n = s.length, seps = ['.', '!', '؟', '?', '…', '؛', ':', '،', ' '];
-    while(i < n && out.length < 60){
-      if(n - i <= max){ out.push(s.slice(i)); break; }
-      var k = -1, j, c;
-      for(j = 0; j < seps.length; j++){ c = s.lastIndexOf(seps[j], i + max - 1); if(c > k) k = c; }
-      if(k < i) k = i + max - 1;
-      var piece = s.slice(i, k + 1).replace(/^\s+|\s+$/g, '');
-      if(piece) out.push(piece);
-      i = k + 1;
-    }
-    return out;
-  }
-  function ttsNote(msg){
-    if(TTS.noteShown) return;
-    TTS.noteShown = true;
-    dropEmpty();
-    var d = document.createElement('div');
-    d.className = 'note';
-    d.appendChild(document.createTextNode(msg));
-    $('log').appendChild(d);
-    scrollDown();
-  }
-  function ttsStop(){
-    TTS.on = false; TTS.q = []; TTS.n = 0; TTS.cur = null;
-    if(TTS.wd){ clearTimeout(TTS.wd); TTS.wd = null; }
-    try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
-    try{ if(TTS.audio) TTS.audio.pause(); }catch(e){}
-    var b = $('stopSnd'); if(b) b.style.display = 'none';
-  }
-  function ttsFinish(){
-    TTS.on = false; TTS.cur = null;
-    if(TTS.wd){ clearTimeout(TTS.wd); TTS.wd = null; }
-    try{ if(window.speechSynthesis && TTS.engine === 'system') speechSynthesis.cancel(); }catch(e){}
-    try{ if(TTS.audio) TTS.audio.pause(); }catch(e){}
-    var b = $('stopSnd'); if(b) b.style.display = 'none';
-    if(S.state === 'speaking') setState('reading');
-  }
-  function ttsSysNext(){
-    if(!TTS.on) return;
-    if(TTS.n >= TTS.q.length){ ttsFinish(); return; }
-    var c = TTS.q[TTS.n]; TTS.n++;
-    try{
-      var u = new SpeechSynthesisUtterance(c);
-      u.lang = 'fa-IR';
-      try{ if(TTS.sysVoice){ u.voice = TTS.sysVoice; u.lang = TTS.sysVoice.lang || u.lang; } }catch(e){}
-      u.rate = RATES[CFG.trIdx] || 1; u.pitch = 1; u.volume = 1;
-      TTS.cur = u;
-      var expect = TTS.n;
-      u.onend = function(){ if(TTS.cur === u){ TTS.cur = null; if(TTS.wd){ clearTimeout(TTS.wd); TTS.wd = null; } ttsSysNext(); } };
-      u.onerror = function(){ if(TTS.cur === u){ TTS.cur = null; ttsSysNext(); } };
-      speechSynthesis.speak(u);
-      if(TTS.wd) clearTimeout(TTS.wd);
-      TTS.wd = setTimeout(function(){
-        if(!TTS.on || TTS.n !== expect || TTS.cur !== u) return;
-        var busy = false;
-        try{ busy = speechSynthesis.speaking || speechSynthesis.pending; }catch(e){}
-        if(!busy) ttsSysNext();
-      }, Math.max(6000, c.length * 150) + 2500);
-    }catch(e){ ttsFinish(); }
-  }
-  function ttsGttsNext(){
-    if(!TTS.on) return;
-    if(TTS.n >= TTS.q.length){ ttsFinish(); return; }
-    var c = TTS.q[TTS.n]; TTS.n++;
-    if(!TTS.audio){
-      try{ TTS.audio = new Audio(); }catch(e){ ttsNote('مرورگر از پخش صدا پشتیبانی نمی‌کند.'); ttsFinish(); return; }
-    }
-    var a = TTS.audio;
-    a.onended = function(){ if(TTS.on) ttsGttsNext(); };
-    a.onerror = function(){
-      if(!TTS.on) return;
-      ttsNote('سرویس صوتی رایگان در دسترس نبود. راهنمای نصب صدای فارسی در تنظیمات برنامه هست.');
-      ttsFinish();
-    };
-    a.src = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=fa&q=' + encodeURIComponent(c);
-    var p;
-    try{ p = a.play(); }catch(e){ a.onerror(); return; }
-    if(p && p.then) p.then(null, function(){
-      if(!TTS.on) return;
-      ttsNote('مرورگر پخش خودکار را مسدود کرد. یک بار روی صفحه بزنید و دوباره امتحان کنید.');
-      ttsFinish();
-    });
-  }
-  function ttsCloudNext(){
-    if(!TTS.on) return;
-    if(TTS.n >= TTS.q.length){ ttsFinish(); return; }
-    var c = TTS.q[TTS.n]; TTS.n++;
-    var base = String(CFG.ttsApi || '').replace(/\/+$/, '');
-    var body = { model: CFG.ttsModel || 'gpt-4o-mini-tts', input: c, voice: CFG.ttsVoice || 'alloy', response_format: 'mp3' };
-    var sp = RATES[CFG.trIdx] || 1;
-    if(sp !== 1) body.speed = sp;
-    fetch(base + '/audio/speech', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + CFG.ttsKey },
-      body: JSON.stringify(body)
-    }).then(function(r){
-      if(!r.ok) throw new Error('HTTP ' + r.status);
-      return r.blob();
-    }).then(function(b){
-      if(!TTS.on) return;
-      if(!TTS.audio) TTS.audio = new Audio();
-      var a = TTS.audio, url = URL.createObjectURL(b);
-      a.onended = function(){ setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(e){} }, 5000); if(TTS.on) ttsCloudNext(); };
-      a.onerror = function(){ if(!TTS.on) return; ttsNote('سرویس صوتی اینترنتی جواب نداد.'); ttsFinish(); };
-      a.src = url;
-      var p = a.play();
-      if(p && p.then) p.then(null, function(){ if(!TTS.on) return; ttsNote('مرورگر پخش خودکار را مسدود کرد.'); ttsFinish(); });
-    }, function(){
-      if(!TTS.on) return;
-      ttsNote('سرویس صوتی اینترنتی جواب نداد. آدرس، کلید و نام مدل را در تنظیمات پیشرفته بررسی کنید.');
-      ttsFinish();
-    });
-  }
-  function speak(text){
-    if(!CFG.tts || !text) return;
-    ttsStop();
-    TTS.on = true; TTS.n = 0;
-    if(CFG.ttsApi && CFG.ttsKey){
-      TTS.engine = 'cloud';
-      TTS.q = ttsSplit(text, 1200);
-      ttsCloudNext();
-    } else {
-      TTS.sysVoice = ttsFindFa();
-      if(TTS.sysVoice){
-        TTS.engine = 'system';
-        TTS.q = ttsSplit(text, 180);
-        ttsSysNext();
-      } else {
-        TTS.engine = 'gtts';
-        TTS.q = ttsSplit(text, 190);
-        ttsGttsNext();
-      }
-    }
-    if(TTS.on){
-      var b = $('stopSnd'); if(b) b.style.display = 'block';
-      setState('speaking');
-    }
-  }
 
   /* ---------- audio input helpers ---------- */
   function ensureCtx(){
@@ -682,6 +498,75 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     return r || 'پاسخ کاملی دریافت نشد. لطفاً دوباره بپرسید.';
   }
 
+  /* ---------- پخش صوتی پاسخ‌ها (سرویس Edge-TTS روی Vercel) ---------- */
+  function stopTts(){
+    if(S.ttsCtl && S.ttsCtl.abort) S.ttsCtl.abort();
+    S.ttsCtl = null;
+    var a = S.ttsAudio;
+    if(a){
+      try{ a.pause(); }catch(e){}
+      try{ a.removeAttribute('src'); a.load(); }catch(e){}
+    }
+    S.ttsAudio = null;
+    S.ttsPlaying = false;
+  }
+  function speakText(text){
+    stopTts();
+    if(CFG.ttsOn !== '1' || !text) return;
+    var base = String(CFG.ttsUrl || '').replace(/\s/g,'').replace(/\/+$/,'');
+    if(!base) return;
+    var voice = CFG.ttsVoice || 'fa-IR-DilaraNeural';
+    var key = String(CFG.ttsKey || '');
+    var a = new Audio();
+    a.preload = 'auto';
+    S.ttsAudio = a;
+    S.ttsPlaying = true;
+    var blobUrl = null, ctl = { aborted:false };
+    S.ttsCtl = ctl;
+    function isMine(){ return S.ttsAudio === a && !ctl.aborted; }
+    function endOk(){
+      if(!isMine() || !S.ttsPlaying) return;
+      S.ttsPlaying = false;
+      if(blobUrl){ try{ URL.revokeObjectURL(blobUrl); }catch(e){} }
+      setState('reading');
+    }
+    function endBad(hint){
+      if(!isMine()) return;
+      S.ttsPlaying = false;
+      if(blobUrl){ try{ URL.revokeObjectURL(blobUrl); }catch(e){} }
+      setState('reading');
+      if(hint && S.mode !== 'img') addNote(hint);
+    }
+    a.addEventListener('ended', endOk);
+    a.addEventListener('error', function(){ endBad('صدای پاسخ پخش نشد؛ اینترنت یا تنظیمات سرویس صدا را بررسی کنید.'); });
+    function startPlay(){
+      if(!isMine()) return;
+      var p = a.play();
+      if(p && p.catch) p.catch(function(){ endBad('برای شنیدن صدا، یک بار روی صفحه بزنید و دوباره سؤال کنید.'); });
+    }
+    setState('reading', 'در حال خواندن پاسخ…');
+    if(text.length <= 500){
+      /* متن کوتاه: استریم مستقیم — پخش سریع شروع می‌شود */
+      a.src = base + '/api/tts?text=' + encodeURIComponent(text) + '&v=' + encodeURIComponent(voice) + (key ? '&key=' + encodeURIComponent(key) : '');
+      startPlay();
+    } else {
+      /* متن بلند: POST تا محدودیت طول نشانی پیش نیاید */
+      fetch(base + '/api/tts', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'x-api-key':key },
+        body: JSON.stringify({ text:text, voice:voice })
+      }).then(function(r){
+        if(!r.ok) throw new Error('tts ' + r.status);
+        return r.blob();
+      }).then(function(b){
+        if(!isMine()) return;
+        blobUrl = URL.createObjectURL(b);
+        a.src = blobUrl;
+        startPlay();
+      }, function(){ endBad('صدای پاسخ پخش نشد؛ اینترنت یا تنظیمات سرویس صدا را بررسی کنید.'); });
+    }
+  }
+
   /* ---------- push-to-talk recording ---------- */
   function beginRecording(tk){
     var ctx = S.ctx;
@@ -719,17 +604,9 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     if(S.holding) return;
     if(S.state === 'thinking') return;
     if(!CFG.key){ openSettings(true); return; }
+    stopTts(); /* اگر صدای پاسخ قبلی در حال پخش است، با شروع سؤال جدید قطع می‌شود */
     try{ ensureCtx(); }catch(e){ addErr(e); return; }
     keepAwake();
-    try{ /* قفل‌گشایی صدای TTS با اولین لمس کاربر */
-      if(window.speechSynthesis && !TTS.primed){
-        TTS.primed = true;
-        var pu = new SpeechSynthesisUtterance(' ');
-        pu.volume = 0;
-        speechSynthesis.speak(pu);
-      }
-    }catch(e){}
-    if(TTS.on) ttsStop(); /* با شروع صحبت جدید، صدای قبلی قطع شود */
     S.holding = true;
     S.token++;
     var tk = S.token;
@@ -790,12 +667,13 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
       if(S.history.length > 8) S.history = S.history.slice(-8);
       setState('reading');
       sndDone();
-      setTimeout(function(){ if(tk === S.token) speak(reply); }, 650);
+      speakText(reply);
     }).then(null, function(e){ if(e !== 'stop' && tk === S.token) fail(e); });
   }
 
   function fail(e){
     hideThinking();
+    stopTts();
     addErr(e, S.mode === 'img' ? $('imgOut') : null); sndErr();
     S.token++; S.holding = false;
     if(S.rec) endRecording();
@@ -912,7 +790,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
       }
       showImgResult(heard, reply);
       setState('reading'); sndDone();
-      setTimeout(function(){ if(tk === S.token) speak(reply); }, 650);
+      speakText(reply);
     }).then(null, function(e){ if(e !== 'stop' && tk === S.token) fail(e); });
   }
     var ib = $('imgBtn'), lastT2 = 0;
@@ -923,7 +801,7 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   }
   ib.addEventListener('touchstart', function(e){ e.preventDefault(); lastT2 = Date.now(); ipress(); }, false);
   ib.addEventListener('touchend', function(e){ e.preventDefault(); lastT2 = Date.now(); vib(70); release(); }, false);
-  ib.addEventListener('touchcancel', function(){ lastTouch = Date.now(); release(); }, false);
+  ib.addEventListener('touchcancel', function(){ lastT2 = Date.now(); release(); }, false);
   ib.addEventListener('mousedown', function(){ if(Date.now() - lastT2 < 800) return; ipress(); }, false);
   ib.addEventListener('contextmenu', function(e){ e.preventDefault(); }, false);
   $('cam').onclick = function(){ S.mode = 'img'; $('imgView').className = 'open'; };
@@ -937,7 +815,6 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   /* ---------- settings screen ---------- */
   function openSettings(advanced){
     fillForm(); applyFs();
-    $('ttsInfo').textContent = (CFG.tts ? 'خواندن خودکار: روشن' : 'خواندن خودکار: خاموش') + ' — موتور فعلی: ' + ttsEngineName();
     $('adv').open = !!advanced || !CFG.key;
     $('settings').className = 'open';
   }
@@ -952,43 +829,6 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
     var ok = vib([200, 100, 200]);
     i.textContent = ok ? 'دستور لرزش پذیرفته شد. اگر گوشی نلرزید، مرورگر یا حالت بی‌صدا/صرفه‌جویی جلوی آن را گرفته است.' : 'مرورگر دستور لرزش را رد کرد (اجازه ندارد).';
   };
-
-  /* ---------- تنظیمات TTS ---------- */
-  function faNum(n){
-    var d = '۰۱۲۳۴۵۶۷۸۹', s = String(n), o = '', i;
-    for(i = 0; i < s.length; i++) o += (s[i] >= '0' && s[i] <= '9') ? d[+s[i]] : s[i];
-    return o;
-  }
-  function applyRate(){
-    if(CFG.trIdx < 0) CFG.trIdx = 0;
-    if(CFG.trIdx > RATES.length - 1) CFG.trIdx = RATES.length - 1;
-    $('rateTxt').textContent = 'سرعت: ' + faNum(Math.round(RATES[CFG.trIdx] * 100)) + '٪';
-  }
-  function ttsBtns(){
-    var on = !!CFG.tts;
-    $('ttsOn').className = on ? '' : 'sec';
-    $('ttsOff').className = on ? 'sec' : '';
-  }
-  function ttsEngineName(){
-    if(CFG.ttsApi && CFG.ttsKey) return 'سرویس اینترنتی (' + (CFG.ttsModel || 'gpt-4o-mini-tts') + ')';
-    if(ttsFindFa()) return 'صدای خود گوشی (رایگان)';
-    return 'سرویس رایگان گوگل (غیررسمی — ممکن است باز نشود)';
-  }
-  $('ttsOn').onclick = function(){ CFG.tts = true; saveCfg(); ttsBtns(); $('ttsInfo').textContent = 'خواندن خودکار روشن شد — موتور: ' + ttsEngineName(); };
-  $('ttsOff').onclick = function(){ CFG.tts = false; saveCfg(); ttsBtns(); ttsStop(); if(S.state === 'speaking') setState('reading'); };
-  $('ttsTest').onclick = function(){
-    readForm(); saveCfg();
-    speak('سلام آقا رضا. صدای پروفسور کار می‌کند.');
-    setTimeout(function(){
-      if(TTS.engine === 'system') $('ttsInfo').textContent = 'در حال پخش با: ' + (TTS.sysVoice && TTS.sysVoice.name ? TTS.sysVoice.name : 'صدای فارسی گوشی');
-      else if(TTS.engine === 'cloud') $('ttsInfo').textContent = 'در حال پخش با سرویس اینترنتی: ' + (CFG.ttsModel || '');
-      else $('ttsInfo').textContent = 'صدای فارسی روی گوشی پیدا نشد؛ تلاش با سرویس رایگان گوگل. اگر صدایی نشنیدید، راهنمای بالای همین بخش را ببینید.';
-    }, 300);
-  };
-  $('stopSnd').onclick = function(){ ttsStop(); if(S.state === 'speaking') setState('reading'); vib(50); };
-  $('rateDown').onclick = function(){ CFG.trIdx--; applyRate(); saveCfg(); };
-  $('rateUp').onclick = function(){ CFG.trIdx++; applyRate(); saveCfg(); };
-
   $('saveBtn').onclick = function(){ readForm(); saveCfg(); $('settings').className = ''; };
   $('closeBtn').onclick = function(){ readForm(); saveCfg(); $('settings').className = ''; };
   $('clearBtn').onclick = function(){
@@ -1017,7 +857,6 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
   };
 
   loadCfg();
-  ttsBtns();
   setState('idle');
   if(!(window.AudioContext || window.webkitAudioContext)) addErr(new Error('این مرورگر قدیمی است. Firefox یا Chrome را نصب کنید.'));
   if(!CFG.key) openSettings(true);
@@ -1025,4 +864,3 @@ summary{font-size:16px;font-weight:bold;color:#444;padding:6px 0}
 </script>
 </body>
 </html>
-
